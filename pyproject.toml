@@ -1,0 +1,180 @@
+[project]
+name = "astraauth"
+version = "0.5.1"
+description = "Astra is a package-first authentication and authorization platform for Python with MFA, OIDC federation, framework adapters, and operator CLI"
+readme = "README.md"
+authors = [
+    { name = "Ankur Grover", email = "grover.ankur@gmail.com" }
+]
+requires-python = ">=3.12"
+dependencies = [
+    "astraauth-adapters",
+    "astraauth-cli",
+    "astraauth-core",
+    "astraauth-idp",
+    "astraauth-plugins",
+    "astraauth-service",
+    "astraauth-webauthn",
+]
+
+[project.scripts]
+astra = "astraauth_cli.__main__:main"
+
+[project.urls]
+Homepage = "https://astraauth.dev"
+Documentation = "https://docs.astraauth.dev"
+Repository = "https://github.com/groverankur/Astra"
+
+[build-system]
+requires = ["uv_build>=0.10.9,<0.11.0"]
+build-backend = "uv_build"
+
+[dependency-groups]
+full-workspace = [
+    "astraauth-adapters[all]",
+    "astraauth-cli[interactive,tui]",
+    "astraauth-core[otp,postgres,mysql,sql-async,redis,zeromq]",
+]
+dev = [
+    "bandit[toml]>=1.8.6",
+    "markdown-meta-extension>=0.5.3",
+    "mkdocs>=1.6.1",
+    "mkdocs-autorefs>=1.4.4",
+    "mkdocs-gen-files>=0.6.1",
+    "mkdocs-literate-nav>=0.6.3",
+    "mkdocs-material>=9.7.6",
+    "mkdocs-section-index>=0.3.11",
+    "mkdocstrings[python]>=1.0.3",
+    "mypy>=1.19.1",
+    "pip-audit>=2.9.0",
+    "pre-commit>=4.5.1",
+    "pytest>=8.0.0",
+    "pytest-asyncio>=0.23.0",
+    "pytest-cov>=4.1.0",
+    "ruff>=0.14.11",
+    "twine>=6.1.0",
+]
+
+[tool.uv]
+default-groups = ["dev"]
+
+[tool.uv.workspace]
+members = [
+    "packages/astraauth-core",
+    "packages/astraauth-adapters",
+    "packages/astraauth-plugins",
+    "packages/astraauth-idp",
+    "packages/astraauth-webauthn",
+    "packages/astraauth-cli",
+    "packages/astraauth-service",
+]
+
+[tool.uv.sources]
+astraauth-core = { workspace = true }
+astraauth-adapters = { workspace = true }
+astraauth-plugins = { workspace = true }
+astraauth-idp = { workspace = true }
+astraauth-webauthn = { workspace = true }
+astraauth-service = { workspace = true }
+astraauth-cli = { workspace = true }
+
+[tool.ruff]
+target-version = "py312"
+line-length = 100
+extend-exclude = [
+    ".git",
+    "__pycache__",
+    "build",
+    "dist",
+    "archive",
+    "src",
+    ".tmp",
+    ".uv-cache",
+    ".venv",
+    ".mypy_cache",
+    ".pytest_cache",
+    ".ruff_cache",
+]
+
+[tool.ruff.lint]
+select = [
+    "E",      # pycodestyle errors
+    "W",      # pycodestyle warnings
+    "F",      # pyflakes
+    "I",      # isort
+    "B",      # flake8-bugbear
+    "C",      # mccabe
+    "N",      # pep8-naming
+    "UP",     # pyupgrade
+]
+ignore = [
+    "E501",   # line too long (handled by line-length)
+    "E203",   # whitespace before ':'
+]
+
+[tool.ruff.format]
+docstring-code-format = true
+docstring-code-line-length = 88
+
+[tool.mypy]
+python_version = "3.12"
+strict = true
+warn_return_any = true
+warn_unused_configs = true
+ignore_missing_imports = false
+disallow_untyped_defs = true
+disallow_incomplete_defs = true
+check_untyped_defs = true
+no_implicit_optional = true
+warn_redundant_casts = true
+warn_unused_ignores = true
+warn_no_return = true
+plugins = ["pydantic.mypy"]
+exclude = "(^archive/|^examples/archive/|^docs/archive/)"
+
+[[tool.mypy.overrides]]
+module = [
+    "joserfc.*",
+    "aiosqlite.*",
+    "aiomysql.*",
+    "flask.*",
+    "glom",
+    "otpauth",
+    "pymysql.*",
+    "robyn",
+    "uuid_utils.*",
+    "fastnanoid.*",
+]
+ignore_missing_imports = true
+
+
+[tool.pytest.ini_options]
+minversion = "7.0"
+testpaths = ["tests", "packages"]
+python_files = "test_*.py"
+addopts = "-v --strict-markers --tb=short -p no:cacheprovider"
+markers = [
+    "unit: Unit tests",
+    "integration: Integration tests",
+    "slow: Slow running tests",
+]
+
+[tool.coverage.run]
+source = ["packages"]
+omit = ["*/tests/*", "*/test_*.py", "*/__init__.py"]
+
+[tool.coverage.report]
+exclude_lines = [
+    "pragma: no cover",
+    "def __repr__",
+    "raise AssertionError",
+    "raise NotImplementedError",
+    "if __name__ == .__main__.:",
+    "if TYPE_CHECKING:",
+    "pass",
+]
+precision = 2
+skip_covered = false
+
+
+

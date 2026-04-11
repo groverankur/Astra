@@ -1,0 +1,171 @@
+name: ci
+
+on:
+  push:
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  quality:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: astral-sh/setup-uv@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Sync workspace
+        run: uv sync --all-groups
+      - name: Ruff
+        run: uv run ruff check packages examples
+      - name: Mypy
+        run: uv run python -m mypy packages examples
+      - name: Core and package tests
+        run: uv run pytest -q packages
+      - name: Docs build
+        env:
+          DISABLE_MKDOCS_2_WARNING: "true"
+        run: uv run mkdocs build --strict
+
+  adapters:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: astral-sh/setup-uv@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Sync workspace
+        run: uv sync --all-groups
+      - name: Install claimed adapter extras
+        run: uv pip install -e "packages/astraauth-adapters[flask,django,asgi]"
+      - name: Run explicit framework adapter tests
+        run: >
+          uv run pytest -q
+          packages/astraauth-adapters/tests/test_flask_asgi_phase7.py
+          packages/astraauth-adapters/tests/test_django_phase7.py
+
+  operator-surfaces:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: astral-sh/setup-uv@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Sync workspace
+        run: uv sync --all-groups
+      - name: Run operator CLI tests
+        run: >
+          uv run pytest -q
+          packages/astraauth-cli/tests/test_cli_main.py
+          packages/astraauth-service/tests/test_factory.py
+
+  relational-backends:
+    runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:16
+        env:
+          POSTGRES_USER: astraauth
+          POSTGRES_PASSWORD: secret
+          POSTGRES_DB: astraauth_test
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U astraauth -d astraauth_test"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 10
+      mysql:
+        image: mysql:8.4
+        env:
+          MYSQL_ROOT_PASSWORD: root-secret
+          MYSQL_DATABASE: astraauth_test
+          MYSQL_USER: astraauth
+          MYSQL_PASSWORD: secret
+        ports:
+          - 3306:3306
+        options: >-
+          --health-cmd "mysqladmin ping -h 127.0.0.1 -uroot -proot-secret"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 20
+    env:
+      ASTRAAUTH_TEST_POSTGRES_DSN: postgresql://astraauth:secret@127.0.0.1:5432/astraauth_test
+      ASTRAAUTH_TEST_MYSQL_DSN: mysql://astraauth:secret@127.0.0.1:3306/astraauth_test
+    steps:
+      - uses: actions/checkout@v4
+      - uses: astral-sh/setup-uv@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Sync workspace
+        run: uv sync --all-groups
+      - name: Install relational backend extras
+        run: uv pip install -e "packages/astraauth-core[postgres,mysql]"
+      - name: Wait for relational services
+        run: |
+          python - <<'PY'
+          import socket
+          import time
+
+          def wait_for_port(host: str, port: int) -> None:
+              deadline = time.time() + 120
+              while time.time() < deadline:
+                  try:
+                      with socket.create_connection((host, port), timeout=2):
+                          return
+                  except OSError:
+                      time.sleep(2)
+              raise SystemExit(f"service not ready: {host}:{port}")
+
+          wait_for_port("127.0.0.1", 5432)
+          wait_for_port("127.0.0.1", 3306)
+          PY
+      - name: Run Postgres and MySQL integration tests
+        run: >
+          uv run pytest -q
+          packages/astraauth-core/tests/test_postgres_integration.py
+          packages/astraauth-core/tests/test_mysql_integration.py
+
+  oidc-confidence:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: astral-sh/setup-uv@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Sync workspace
+        run: uv sync --all-groups
+      - name: Run OIDC confidence suite
+        run: >
+          uv run pytest -q
+          packages/astraauth-idp/tests/test_oidc_phase6_step1.py
+          packages/astraauth-service/tests/test_oidc_integration.py
+          packages/astraauth-service/tests/test_oidc_jwks_validation.py
+          packages/astraauth-service/tests/test_oidc_provider_confidence.py
+          packages/astraauth-adapters/tests/test_oidc_mount_phase6.py
+
+  security:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: astral-sh/setup-uv@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Sync workspace
+        run: uv sync --all-groups
+      - name: Bandit high-confidence scan
+        run: uv run bandit -q -r packages -x packages/*/tests -lll -iii
+      - name: Pip audit
+        run: uv run pip-audit --progress-spinner=off
+
+
+
+
+

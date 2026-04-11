@@ -1,0 +1,126 @@
+name: publish
+
+on:
+  workflow_dispatch:
+    inputs:
+      package:
+        description: "Workspace package to publish"
+        required: true
+        type: choice
+        options:
+          - astraauth-core
+          - astraauth-adapters
+          - astraauth-plugins
+          - astraauth-idp
+          - astraauth-webauthn
+          - astraauth-service
+          - astraauth-cli
+      repository:
+        description: "Publish destination"
+        required: true
+        default: "pypi"
+        type: choice
+        options:
+          - pypi
+          - testpypi
+  push:
+    tags:
+      - "release/*"
+
+permissions:
+  contents: read
+  id-token: write
+
+jobs:
+  publish-manual:
+    if: github.event_name == 'workflow_dispatch'
+    runs-on: ubuntu-latest
+    environment:
+      name: ${{ inputs.repository }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: astral-sh/setup-uv@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Sync workspace
+        run: uv sync --all-groups
+
+      - name: Build selected package
+        run: uv build --package ${{ inputs.package }} --out-dir dist --clear
+
+      - name: Verify metadata
+        run: uv run python -m twine check dist/*
+
+      - name: Publish to TestPyPI
+        if: inputs.repository == 'testpypi'
+        uses: pypa/gh-action-pypi-publish@release/v1
+        with:
+          repository-url: https://test.pypi.org/legacy/
+          packages-dir: dist/
+
+      - name: Publish to PyPI
+        if: inputs.repository == 'pypi'
+        uses: pypa/gh-action-pypi-publish@release/v1
+        with:
+          packages-dir: dist/
+
+  resolve-tag:
+    if: github.event_name == 'push'
+    runs-on: ubuntu-latest
+    outputs:
+      package: ${{ steps.parse.outputs.package }}
+      repository: ${{ steps.parse.outputs.repository }}
+    steps:
+      - id: parse
+        shell: bash
+        run: |
+          ref_name="${GITHUB_REF_NAME}"
+          IFS='/' read -r prefix package version <<< "$ref_name"
+          if [[ "$prefix" != "release" || -z "$package" || -z "$version" ]]; then
+            echo "Unexpected release tag format: $ref_name" >&2
+            exit 1
+          fi
+          repository="pypi"
+          if [[ "$version" == *"-testpypi" ]]; then
+            repository="testpypi"
+          fi
+          echo "package=$package" >> "$GITHUB_OUTPUT"
+          echo "repository=$repository" >> "$GITHUB_OUTPUT"
+
+  publish-tag:
+    if: github.event_name == 'push'
+    runs-on: ubuntu-latest
+    needs: [resolve-tag]
+    environment:
+      name: ${{ needs.resolve-tag.outputs.repository }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: astral-sh/setup-uv@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Sync workspace
+        run: uv sync --all-groups
+
+      - name: Build selected package
+        run: uv build --package ${{ needs.resolve-tag.outputs.package }} --out-dir dist --clear
+
+      - name: Verify metadata
+        run: uv run python -m twine check dist/*
+
+      - name: Publish to TestPyPI
+        if: needs.resolve-tag.outputs.repository == 'testpypi'
+        uses: pypa/gh-action-pypi-publish@release/v1
+        with:
+          repository-url: https://test.pypi.org/legacy/
+          packages-dir: dist/
+
+      - name: Publish to PyPI
+        if: needs.resolve-tag.outputs.repository == 'pypi'
+        uses: pypa/gh-action-pypi-publish@release/v1
+        with:
+          packages-dir: dist/
+

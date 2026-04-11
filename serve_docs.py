@@ -1,0 +1,30 @@
+#!/usr/bin/env python3
+"""Serve the MkDocs documentation site locally."""
+
+import subprocess
+import sys
+from pathlib import Path
+
+
+def serve_docs()-> None:
+    """Serve the documentation site locally."""
+    project_root = Path(__file__).parent
+
+    try:
+        # Use uv to run mkdocs serve
+        cmd = ["uv", "run", "mkdocs", "serve"]
+        print("Starting MkDocs development server...")
+        print("Documentation will be available at: http://localhost:8000")
+        print("Press Ctrl+C to stop the server")
+
+        subprocess.run(cmd, cwd=project_root, check=True)
+
+    except subprocess.CalledProcessError as e:
+        print(f"Error starting MkDocs server: {e}")
+        sys.exit(1)
+    except KeyboardInterrupt:
+        print("\nStopping MkDocs server...")
+        sys.exit(0)
+
+if __name__ == "__main__":
+    serve_docs()

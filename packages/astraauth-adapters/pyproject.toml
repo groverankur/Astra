@@ -1,0 +1,87 @@
+[project]
+name = "astraauth-adapters"
+description = "Astra Setu (`astraauth-adapters`): ASGI, FastAPI, Flask, Django, Litestar, and Robyn wiring for Astra"
+version = "0.5.1"
+readme = "README.md"
+requires-python = ">=3.12"
+authors = [
+    { name = "Ankur Grover", email = "grover.ankur@gmail.com" }
+]
+classifiers = [
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.13",
+    "Programming Language :: Python :: 3.14",
+    "Typing :: Typed",
+    "Framework :: FastAPI",
+    "Framework :: Django",
+    "Framework :: Flask",
+]
+keywords = ["authentication", "authorization", "oauth", "oidc", "adapters"]
+# Core dependency only
+dependencies = [
+    "astraauth-core>=0.5.1",
+    "astraauth-plugins>=0.5.1",
+]
+
+[project.urls]
+Homepage = "https://astraauth.dev"
+Repository = "https://github.com/groverankur/Astra"
+Documentation = "https://docs.astraauth.dev"
+
+# Optional framework extras
+[project.optional-dependencies]
+
+fastapi = [
+    "fastapi[standard-no-fastapi-cloud-cli]",
+]
+
+litestar = [
+    "litestar[standard]",
+]
+
+robyn = [
+    "robyn",
+]
+
+flask = [
+    "flask>=3.0.0",
+]
+
+asgi = [
+    "starlette>=0.40.0",
+]
+
+django = [
+    "django>=5.2.0",
+]
+
+# Install everything at once
+all = [
+    "fastapi[standard-no-fastapi-cloud-cli]",
+    "litestar[standard]",
+    "robyn",
+    "flask>=3.0.0",
+    "starlette>=0.40.0",
+    "django>=5.2.0",
+]
+
+[dependency-groups]
+dev = [
+    "mypy>=1.19.1",
+    "pre-commit>=4.5.1",
+    "pytest>=8.0.0",
+    "pytest-asyncio>=0.23.0",
+    "pytest-cov>=4.1.0",
+    "ruff>=0.14.11",
+]
+
+[tool.hatch.build.targets.wheel]
+packages = ["astraauth_adapters"]
+
+
+[build-system]
+requires = ["hatchling>=1.18"]
+build-backend = "hatchling.build"
+
+

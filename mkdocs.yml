@@ -1,0 +1,130 @@
+site_name: Astra Docs
+site_description: Astra is a package-first authentication and authorization platform for Python
+site_author: Ankur Grover
+site_url: https://docs.astraauth.dev/
+
+repo_name: groverankur/Astra
+repo_url: https://github.com/groverankur/Astra
+edit_uri: edit/main/docs/
+exclude_docs: |
+  archive/
+
+copyright: Copyright © 2026 Ankur Grover
+
+theme:
+  name: material
+  palette:
+    - media: "(prefers-color-scheme)"
+      toggle:
+        icon: material/brightness-auto
+        name: Switch to light mode
+    - media: "(prefers-color-scheme: light)"
+      scheme: default
+      primary: blue
+      accent: blue
+      toggle:
+        icon: material/brightness-7
+        name: Switch to dark mode
+    - media: "(prefers-color-scheme: dark)"
+      scheme: slate
+      primary: blue
+      accent: blue
+      toggle:
+        icon: material/brightness-4
+        name: Switch to system preference
+  features:
+    - announce.dismiss
+    - content.action.edit
+    - content.action.view
+    - content.code.annotate
+    - content.code.copy
+    - content.code.select
+    - content.tabs.link
+    - navigation.expand
+    - navigation.footer
+    - navigation.instant
+    - navigation.instant.prefetch
+    - navigation.instant.progress
+    - navigation.sections
+    - navigation.tabs
+    - navigation.tabs.sticky
+    - navigation.top
+    - search.highlight
+    - search.share
+    - search.suggest
+    - toc.follow
+
+plugins:
+  - search
+  - autorefs
+  - section-index
+  - mkdocstrings:
+      handlers:
+        python:
+          options:
+            docstring_style: google
+            heading_level: 1
+            inherited_members: true
+            merge_init_into_class: true
+            show_root_heading: true
+            show_root_toc_entry: true
+            show_source: true
+            show_submodules: true
+            summary: true
+
+markdown_extensions:
+  - admonition
+  - attr_list
+  - def_list
+  - footnotes
+  - md_in_html
+  - tables
+  - toc:
+      permalink: true
+  - pymdownx.details
+  - pymdownx.highlight:
+      anchor_linenums: true
+      pygments_lang_class: true
+  - pymdownx.inlinehilite
+  - pymdownx.snippets:
+      check_paths: true
+  - pymdownx.superfences:
+      custom_fences:
+        - name: mermaid
+          class: mermaid
+  - pymdownx.tabbed:
+      alternate_style: true
+  - pymdownx.tasklist:
+      custom_checkbox: true
+
+nav:
+  - Home: index.md
+  - Getting Started:
+      - Installation: getting-started/installation.md
+      - Quick Start: getting-started/quick-start.md
+      - Configuration: getting-started/configuration.md
+  - User Guide:
+      - Authentication: user-guide/authentication.md
+      - Authorization: user-guide/authorization.md
+      - Multi-Factor Authentication: user-guide/mfa.md
+      - OIDC Federation: user-guide/oidc-federation.md
+      - Plugins: user-guide/plugins.md
+  - Examples:
+      - Bootstrap Runtime: examples/bootstrap-runtime.md
+  - Platform:
+      - Package Summary: about/package-summary.md
+      - Status and Scope: about/status.md
+      - RFC Status: RFC.md
+  - API Reference:
+      - Core: api/core.md
+      - Adapters: api/adapters.md
+      - Service: api/service.md
+      - Plugins: api/plugins.md
+      - IdP: api/idp.md
+      - WebAuthn: api/webauthn.md
+      - CLI: api/cli.md
+  - About:
+      - Changelog: about/changelog.md
+      - License: about/license.md
+      - Contributing: about/contributing.md
+      - Security: about/security.md

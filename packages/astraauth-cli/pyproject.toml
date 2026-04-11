@@ -1,0 +1,61 @@
+[project]
+name = "astraauth-cli"
+version = "0.5.1"
+description = "Astra Dwaar (`astraauth-cli`): operator CLI, interactive wizard, TUI, diagnostics, and key-management tooling for Astra"
+readme = "README.md"
+requires-python = ">=3.12"
+authors = [
+    { name = "Ankur Grover", email = "grover.ankur@gmail.com" }
+]
+classifiers = [
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.13",
+    "Programming Language :: Python :: 3.14",
+    "Typing :: Typed",
+    "Environment :: Console",
+]
+keywords = ["authentication", "authorization", "oauth", "oidc", "cli"]
+
+dependencies = [
+    "astraauth-core>=0.5.1",
+    "astraauth-service>=0.5.1",
+    "rich>=14.1.0",
+    "typer>=0.20.0",
+]
+
+[project.urls]
+Homepage = "https://astraauth.dev"
+Repository = "https://github.com/groverankur/Astra"
+Documentation = "https://docs.astraauth.dev"
+
+[project.scripts]
+astra = "astraauth_cli.__main__:main"
+astraauth-cli = "astraauth_cli.__main__:main"
+
+[project.optional-dependencies]
+interactive = [
+    "questionary>=2.1.0",
+]
+tui = [
+    "textual>=0.89.1",
+]
+
+[dependency-groups]
+dev = [
+    "mypy>=1.19.1",
+    "pre-commit>=4.5.1",
+    "pytest>=8.0.0",
+    "pytest-asyncio>=0.23.0",
+    "pytest-cov>=4.1.0",
+    "ruff>=0.14.11",
+]
+
+[tool.hatch.build.targets.wheel]
+packages = ["astraauth_cli"]
+
+[build-system]
+requires = ["hatchling>=1.18"]
+build-backend = "hatchling.build"
+
+

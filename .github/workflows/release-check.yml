@@ -1,0 +1,59 @@
+name: release-check
+
+on:
+  workflow_dispatch:
+  pull_request:
+    paths:
+      - "pyproject.toml"
+      - "packages/**/pyproject.toml"
+      - "packages/**/README.md"
+      - ".github/workflows/release-check.yml"
+
+permissions:
+  contents: read
+
+jobs:
+  build-and-check:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: astral-sh/setup-uv@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Sync workspace
+        run: uv sync --all-groups
+      - name: Build all workspace packages
+        run: uv build --all-packages --out-dir dist --clear
+      - name: Twine metadata check
+        run: uv run python -m twine check dist/*
+
+  standalone-install:
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        package:
+          - astraauth-core
+          - astraauth-adapters
+          - astraauth-plugins
+          - astraauth-idp
+          - astraauth-webauthn
+          - astraauth-service
+          - astraauth-cli
+    steps:
+      - uses: actions/checkout@v4
+      - uses: astral-sh/setup-uv@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Build all workspace packages
+        run: uv build --all-packages --out-dir dist --clear
+      - name: Create isolated environment
+        run: uv venv .release-check
+      - name: Install package from built artifacts
+        run: uv pip install --python .release-check/bin/python --find-links dist ${{ matrix.package }}
+      - name: Smoke check CLI package
+        if: matrix.package == 'astraauth-cli'
+        run: ./.release-check/bin/astra version
+

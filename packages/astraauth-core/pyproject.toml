@@ -1,0 +1,86 @@
+[project]
+name = "astraauth-core"
+description = "Astra Yantra (`astraauth-core`): framework-agnostic auth, token, MFA, authorization, and persistence primitives for Astra"
+version = "0.5.1"
+readme = "README.md"
+requires-python = ">=3.12"
+authors = [
+    { name = "Ankur Grover", email = "grover.ankur@gmail.com" }
+]
+classifiers = [
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.13",
+    "Programming Language :: Python :: 3.14",
+    "Typing :: Typed",
+    "Framework :: Pydantic",
+]
+keywords = ["authentication", "authorization", "oauth", "oidc", "security"]
+dependencies = [
+    "cryptography",
+    "fastnanoid",
+    "glom",
+    "joserfc",
+    "pydantic-extra-types",
+    "pydantic-settings",
+    "pydantic[email,timezone]",
+    "tzlocal",
+    "uuid-utils",
+]
+
+[project.urls]
+Homepage = "https://astraauth.dev"
+Repository = "https://github.com/groverankur/Astra"
+Documentation = "https://docs.astraauth.dev"
+
+
+[project.optional-dependencies]
+otp = [
+    "otpauth>=1.1.0",
+]
+
+redis = [
+    "redis>=5.0.0",
+]
+
+sqlite = [
+    "aiosqlite>=0.20.0",
+]
+
+postgres = [
+    "psycopg[binary]>=3.2.0",
+]
+
+mysql = [
+    "pymysql>=1.1.0",
+]
+
+sql-async = [
+    "aiosqlite>=0.20.0",
+    "psycopg[binary]>=3.2.0",
+    "aiomysql>=0.2.0",
+]
+
+zeromq = [
+    "pyzmq>=26.0.0",
+]
+
+[dependency-groups]
+dev = [
+    "aiosqlite>=0.20.0",
+    "mypy>=1.19.1",
+    "pre-commit>=4.5.1",
+    "pytest>=8.0.0",
+    "pytest-asyncio>=0.23.0",
+    "pytest-cov>=4.1.0",
+    "ruff>=0.14.11",
+]
+
+[tool.hatch.build.targets.wheel]
+packages = ["astraauth_core"]
+
+[build-system]
+requires = ["hatchling>=1.18"]
+build-backend = "hatchling.build"
+
+

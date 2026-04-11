@@ -1,0 +1,27 @@
+# Python-generated files
+__pycache__/
+*.py[oc]
+build/
+dist/
+wheels/
+*.egg-info
+site/
+node_modules/
+
+# Virtual environments
+.venv
+.gitnexus
+archive
+.astraauth
+
+# Local workspace caches
+.mypy_cache/
+.pytest_cache/
+.ruff_cache/
+.tmp/
+.uv-cache/
+.uv-build-cache/
+.example-workspaces/
+astraauth-bootstrap-runtime-*/
+*.tmp
+Astraauth.7z

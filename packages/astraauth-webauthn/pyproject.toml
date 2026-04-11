@@ -1,0 +1,50 @@
+[project]
+name = "astraauth-webauthn"
+version = "0.5.1"
+description = "Astra Mudra (`astraauth-webauthn`): WebAuthn ceremony models, repositories, and MFA upgrade flows for Astra"
+readme = "README.md"
+requires-python = ">=3.12"
+authors = [
+    { name = "Ankur Grover", email = "grover.ankur@gmail.com" }
+]
+classifiers = [
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.13",
+    "Programming Language :: Python :: 3.14",
+    "Typing :: Typed",
+]
+keywords = ["authentication", "authorization", "webauthn", "mfa", "security"]
+
+dependencies = [
+    "astraauth-core>=0.5.1",
+]
+
+[project.urls]
+Homepage = "https://astraauth.dev"
+Repository = "https://github.com/groverankur/Astra"
+Documentation = "https://docs.astraauth.dev"
+
+[project.optional-dependencies]
+webauthn = [
+    "webauthn>=2.7.0",
+]
+
+[dependency-groups]
+dev = [
+    "mypy>=1.19.1",
+    "pre-commit>=4.5.1",
+    "pytest>=8.0.0",
+    "pytest-asyncio>=0.23.0",
+    "pytest-cov>=4.1.0",
+    "ruff>=0.14.11",
+]
+
+[tool.hatch.build.targets.wheel]
+packages = ["astraauth_webauthn"]
+
+[build-system]
+requires = ["hatchling>=1.18"]
+build-backend = "hatchling.build"
+
+

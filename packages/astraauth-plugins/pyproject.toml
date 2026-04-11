@@ -1,0 +1,45 @@
+[project]
+name = "astraauth-plugins"
+version = "0.5.1"
+description = "Astra Tantra (`astraauth-plugins`): tenant-aware plugin runtime, hook contracts, and built-in signal plugins for Astra"
+readme = "README.md"
+requires-python = ">=3.12"
+authors = [
+    { name = "Ankur Grover", email = "grover.ankur@gmail.com" }
+]
+classifiers = [
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.13",
+    "Programming Language :: Python :: 3.14",
+    "Typing :: Typed",
+]
+keywords = ["authentication", "authorization", "plugins", "extensions"]
+
+dependencies = [
+    "astraauth-core>=0.5.1",
+]
+
+[project.urls]
+Homepage = "https://astraauth.dev"
+Repository = "https://github.com/groverankur/Astra"
+Documentation = "https://docs.astraauth.dev"
+
+[tool.hatch.build.targets.wheel]
+packages = ["astraauth_plugins"]
+
+[build-system]
+requires = ["hatchling>=1.18"]
+build-backend = "hatchling.build"
+
+[dependency-groups]
+dev = [
+    "mypy>=1.19.1",
+    "pre-commit>=4.5.1",
+    "pytest>=8.0.0",
+    "pytest-asyncio>=0.23.0",
+    "pytest-cov>=4.1.0",
+    "ruff>=0.14.11",
+]
+
+
