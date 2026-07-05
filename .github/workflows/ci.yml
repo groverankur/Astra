@@ -63,4 +63,4 @@ jobs:
         uses: cssnr/zensical-action@fd73e847ab603a83970fc530a3a17c19fa19e407 # v1.0.8
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
-          prepare: pip install mkdocstrings mkdocstrings-python
+          prepare: uv tool install --force --with mkdocstrings --with mkdocstrings-python zensical==$ZENSICAL_VERSION

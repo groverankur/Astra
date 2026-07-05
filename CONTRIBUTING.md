@@ -45,9 +45,7 @@ uv run mkdocs build --strict
 If your change affects packaging or public behavior, also review:
 
 - [`CHANGELOG.md`](CHANGELOG.md)
-- [`docs/PUBLISHING.md`](docs/PUBLISHING.md)
-- [`docs/VERSIONING.md`](docs/VERSIONING.md)
-- [`docs/PRODUCTION_READINESS.md`](docs/PRODUCTION_READINESS.md)
+- [`docs/about/status.md`](docs/about/status.md)
 
 ## Security-Sensitive Changes
 
