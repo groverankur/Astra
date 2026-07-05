@@ -464,18 +464,18 @@ def create_admin_app(*, home: Path | None = None) -> FastAPI:  # noqa: C901
                     '<div style="padding: 8px; margin-bottom: 6px; border: 1px solid var(--border); border-radius: 4px; background: var(--bg-panel);">'
                 )
                 html_list.append(
-                    f"<strong>entity: {escaped_name}</strong><br/>"
-                )  # nosemgrep: python.django.security.injection.raw-html-format.raw-html-format
+                    f"<strong>entity: {escaped_name}</strong><br/>"  # nosemgrep: python.django.security.injection.raw-html-format.raw-html-format
+                )
                 if obj.relations:
                     escaped_rels = pyhtml.escape(", ".join(obj.relations.keys()))
                     html_list.append(
-                        f'<span style="font-size: 0.9em; color: var(--accent);">Relations:</span> <code style="font-size: 0.9em;">{escaped_rels}</code><br/>'
-                    )  # nosemgrep: python.django.security.injection.raw-html-format.raw-html-format
+                        f'<span style="font-size: 0.9em; color: var(--accent);">Relations:</span> <code style="font-size: 0.9em;">{escaped_rels}</code><br/>'  # nosemgrep: python.django.security.injection.raw-html-format.raw-html-format
+                    )
                 if obj.permissions:
                     escaped_perms = pyhtml.escape(", ".join(obj.permissions.keys()))
                     html_list.append(
-                        f'<span style="font-size: 0.9em; color: var(--text);">Permissions:</span> <code style="font-size: 0.9em;">{escaped_perms}</code>'
-                    )  # nosemgrep: python.django.security.injection.raw-html-format.raw-html-format
+                        f'<span style="font-size: 0.9em; color: var(--text);">Permissions:</span> <code style="font-size: 0.9em;">{escaped_perms}</code>'  # nosemgrep: python.django.security.injection.raw-html-format.raw-html-format
+                    )
                 html_list.append("</div>")
             html_list.append("</div>")
             return Response("".join(html_list), media_type="text/html")

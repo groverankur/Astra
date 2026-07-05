@@ -12,7 +12,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout Repository
-        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+        uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
 
       - name: Install uv Package Manager
         uses: astral-sh/setup-uv@fac544c07dec837d0ccb6301d7b5580bf5edae39 # v8.2.0
@@ -57,9 +57,9 @@ jobs:
       contents: write
     steps:
       - name: Checkout Repository
-        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+        uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
 
       - name: Build & Publish Zensical Docs
-        uses: zensical/zensical-action@5a297920199d75069b222956cfb81cfef7c9e992 # v1.0.0
+        uses: cssnr/zensical-action@fd73e847ab603a83970fc530a3a17c19fa19e407 # v1.0.8
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
