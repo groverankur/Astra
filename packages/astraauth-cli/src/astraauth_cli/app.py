@@ -822,11 +822,15 @@ def admin_ui_command(
     host: Annotated[str, typer.Option("--host")] = "127.0.0.1",
     port: Annotated[int, typer.Option("--port")] = 8088,
     tui: Annotated[bool, typer.Option("--tui")] = False,
+    no_tui: Annotated[bool, typer.Option("--no-tui")] = False,
 ) -> None:
     resolved_home = resolve_home(home)
     if tui:
         if run_textual_admin_ui(home=resolved_home):
             return
+        no_tui = True
+
+    if no_tui:
         run_admin_ui(
             home=resolved_home,
             init_admin=init_admin_command,

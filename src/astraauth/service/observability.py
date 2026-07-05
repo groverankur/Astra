@@ -107,6 +107,16 @@ def record_event(
     logger = logging.getLogger(logger_name)
     logger.setLevel(logging.INFO)
     logger.propagate = False
+
+    # Clean up any stale file handlers from previous test runs
+    for h in list(logger.handlers):
+        if isinstance(h, logging.FileHandler) and Path(h.baseFilename) != path:
+            try:
+                h.close()
+            except Exception:
+                pass
+            logger.removeHandler(h)
+
     if not any(
         isinstance(handler, logging.FileHandler) and Path(handler.baseFilename) == path
         for handler in logger.handlers
