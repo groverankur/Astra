@@ -1,0 +1,18 @@
+﻿<div id="status-region" hx-swap-oob="innerHTML">
+  {{ status_html | safe }}
+</div>
+{% if refresh_sidebar %}
+<div id="sidebar-region" hx-swap-oob="innerHTML">
+  {{ sidebar_html | safe }}
+</div>
+{% endif %}
+{% if refresh_summary %}
+<div id="summary-region" hx-swap-oob="innerHTML">
+  {{ summary_html | safe }}
+</div>
+{% endif %}
+{% if refresh_workspace_panel %}
+<div id="workspace-tab-panel" hx-swap-oob="innerHTML">
+  {{ workspace_panel_html | safe }}
+</div>
+{% endif %}

@@ -1,0 +1,65 @@
+name: Continuous Integration & Deployment
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  verify:
+    name: Code Quality, Type Check & Security Audit
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+
+      - name: Install uv Package Manager
+        uses: astral-sh/setup-uv@f94d406d6016c04f9814573856a36bc8d71c0bda # v5.1.0
+        with:
+          enable-cache: true
+          version: "latest"
+
+      - name: Install Python 3.12
+        run: uv python install 3.12
+
+      - name: Synchronize Workspace dependencies
+        run: uv sync --all-groups --all-extras
+
+      - name: Verify Code Style and Format
+        run: |
+          uv run ruff check .
+          uv run ruff format --check .
+
+      - name: Run Bandit Security Scanning
+        run: uv run bandit -r src/ packages/ -s B101,B105,B106,B110,B608
+
+      - name: Run Semgrep Static Security Scan
+        run: |
+          pip install semgrep
+          semgrep --config auto --error
+
+      - name: Audit Third-Party Dependencies (pip-audit)
+        run: uv run pip-audit
+
+      - name: Run Ty Static Type Checks
+        run: uv run ty check .
+
+      - name: Run Pytest Suite
+        run: uv run pytest
+
+  deploy-docs:
+    name: Build & Deploy Documentation to Pages
+    needs: verify
+    if: github.ref == 'refs/heads/main' && github.event_name == 'push'
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+
+      - name: Build & Publish Zensical Docs
+        uses: zensical/zensical-action@5a297920199d75069b222956cfb81cfef7c9e992 # v1.0.0
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}

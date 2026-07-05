@@ -1,0 +1,187 @@
+[project]
+name = "astraauth"
+version = "1.0.0"
+description = "Astra is a package-first authentication and authorization platform for Python with MFA, OIDC federation, framework adapters, and operator CLI"
+readme = "README.md"
+authors = [
+    { name = "Ankur Grover", email = "grover.ankur@gmail.com" }
+]
+requires-python = ">=3.12"
+dependencies = [
+    "cryptography",
+    "fastnanoid",
+    "glom",
+    "httpx2>=2.5.0",
+    "joserfc",
+    "pwdlib[argon2]>=0.3.0",
+    "pydantic-extra-types",
+    "pydantic-settings",
+    "pydantic[email,timezone]",
+    "tzlocal",
+    "uuid-utils",
+    "watchfiles>=0.21.0",
+]
+
+[project.scripts]
+astra = "astraauth_cli.__main__:main"
+
+[project.urls]
+Homepage = "https://astraauth.dev"
+Documentation = "https://docs.astraauth.dev"
+Repository = "https://github.com/groverankur/Astra"
+
+[build-system]
+requires = ["uv_build>=0.10.9,<0.12.0"]
+build-backend = "uv_build"
+
+[project.optional-dependencies]
+otp = [
+    "otpauth>=1.1.0",
+]
+redis = [
+    "redis>=5.0.0",
+]
+sqlite = [
+    "aiosqlite>=0.20.0",
+]
+postgres = [
+    "psycopg[binary]>=3.2.0",
+]
+mysql = [
+    "pymysql>=1.1.0",
+]
+sql-async = [
+    "aiosqlite>=0.20.0",
+    "psycopg[binary]>=3.2.0",
+    "aiomysql>=0.2.0",
+]
+zeromq = [
+    "pyzmq>=26.0.0",
+]
+webauthn = [
+    "webauthn>=2.7.0",
+]
+fastapi = [
+    "fastapi[standard-no-fastapi-cloud-cli]",
+]
+litestar = [
+    "litestar[standard]",
+]
+robyn = [
+    "robyn",
+]
+flask = [
+    "flask>=3.0.0",
+]
+asgi = [
+    "starlette>=0.40.0",
+]
+django = [
+    "django>=5.2.0",
+]
+all-adapters = [
+    "fastapi[standard-no-fastapi-cloud-cli]",
+    "litestar[standard]",
+    "robyn",
+    "flask>=3.0.0",
+    "starlette>=0.40.0",
+    "django>=5.2.0",
+]
+
+[dependency-groups]
+full-workspace = [
+    "astraauth-admin-ui",
+    "astraauth-cli[interactive,tui]",
+    "astraauth-plugins",
+    "astraauth-policy",
+    "astraauth-tenancy",
+    "astraauth[otp,postgres,mysql,sql-async,redis,zeromq,webauthn,all-adapters]",
+]
+dev = [
+    "bandit[toml]>=1.8.6",
+    "markdown-meta-extension>=0.5.3",
+    "mkdocstrings-python>=1.18.2",
+    "ty>=0.0.51",
+    "pip-audit>=2.9.0",
+    "pre-commit>=4.5.1",
+    "pytest>=8.0.0",
+    "pytest-asyncio>=0.23.0",
+    "pytest-cov>=4.1.0",
+    "ruff>=0.14.11",
+    "twine>=6.1.0",
+    "zensical>=0.0.11",
+]
+
+[tool.uv]
+exclude-newer = "7 days"
+default-groups = ["dev"]
+
+[tool.uv.workspace]
+members = [
+    "packages/astraauth-cli",
+    "packages/astraauth-admin-ui",
+    "packages/astraauth-plugins",
+    "packages/astraauth-policy",
+    "packages/astraauth-tenancy",
+]
+
+[tool.uv.sources]
+astraauth = { workspace = true }
+astraauth-plugins = { workspace = true }
+astraauth-cli = { workspace = true }
+astraauth-admin-ui = { workspace = true }
+astraauth-policy = { workspace = true }
+astraauth-tenancy = { workspace = true }
+
+[tool.ruff]
+target-version = "py312"
+line-length = 100
+extend-exclude = [
+    ".git",
+    "__pycache__",
+    "build",
+    "dist",
+    "archive",
+    ".tmp",
+    ".uv-cache",
+    ".venv",
+    ".pytest_cache",
+    ".ruff_cache",
+    "copy_codebase.py",
+]
+
+[tool.ruff.lint]
+select = [
+    "E",      # pycodestyle errors
+    "W",      # pycodestyle warnings
+    "F",      # pyflakes
+    "I",      # isort
+    "B",      # flake8-bugbear
+    "C",      # mccabe
+    "N",      # pep8-naming
+    "UP",     # pyupgrade
+]
+ignore = [
+    "E501",   # line too long (handled by line-length)
+    "E203",   # whitespace before ':'
+]
+
+[tool.ruff.format]
+docstring-code-format = true
+docstring-code-line-length = 88
+
+[tool.pytest.ini_options]
+markers = [
+    "integration: marks tests as database/external integration tests",
+]
+
+[tool.bandit]
+exclude_dirs = [
+    "tests",
+    ".venv",
+    "examples",
+    "site",
+    "build",
+    "dist"
+]
+skips = ["B101", "B105", "B106", "B110"]

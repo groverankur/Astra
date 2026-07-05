@@ -1,0 +1,47 @@
+{% from "macros/ui.html" import info_tile, panel, status_list %}
+{% call panel("Runtime Overview", "Health, config, and plugin inventory for this deployment.") %}
+<div class="overview-grid">
+  <div class="overview-card">
+    <h3>Operational Posture</h3>
+    <div class="info-tile-grid">
+      {{ info_tile("Health", "Healthy" if health.ok else "Needs attention", "Runtime status based on current checks") }}
+      {{ info_tile("Issuer", inventory.issuer or "-", "Current issuer value exposed by the runtime") }}
+      {{ info_tile("Environment", inventory.environment or "-", "Environment profile loaded from config") }}
+      {{ info_tile("Bootstrap Admins", bootstrap.admins|length, "Operator identities recorded in bootstrap state") }}
+    </div>
+  </div>
+  <div class="overview-card">
+    <h3>Runtime Inventory</h3>
+    <dl class="kv-list">
+      <div><dt>OIDC Providers</dt><dd>{{ inventory.oidc_providers|join(", ") if inventory.oidc_providers else "None configured" }}</dd></div>
+      <div><dt>Registered Plugins</dt><dd>{{ inventory.registered_plugins|join(", ") if inventory.registered_plugins else "None registered" }}</dd></div>
+      <div><dt>Tenant Plugin Map</dt><dd>{{ inventory.tenant_plugins|length }} tenant entries</dd></div>
+      <div><dt>Config State</dt><dd>{{ "Configured" if config.configured else "Missing or invalid" }}</dd></div>
+    </dl>
+  </div>
+</div>
+
+<div class="overview-grid">
+  <div class="overview-card">
+    <h3>Health Details</h3>
+    {{ status_list(health.details) }}
+  </div>
+  <div class="overview-card">
+    <h3>Bootstrap Admins</h3>
+    {% if bootstrap.admins %}
+    <ul class="status-list">
+      {% for admin in bootstrap.admins %}
+      <li>{{ admin.username }} on {{ admin.tenant_id }}{% if admin.email %} · {{ admin.email }}{% endif %}</li>
+      {% endfor %}
+    </ul>
+    {% else %}
+    <div class="empty-state">No bootstrap admins are recorded yet.</div>
+    {% endif %}
+  </div>
+</div>
+
+<details class="detail-panel">
+  <summary>View raw config snapshot</summary>
+  <pre class="pretty-output">{{ config | tojson(indent=2) }}</pre>
+</details>
+{% endcall %}

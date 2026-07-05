@@ -1,0 +1,7 @@
+{% from "macros/ui.html" import metric_card %}
+<section class="metric-grid">
+  {{ metric_card("Environment", inventory.environment or "-", "Current runtime environment") }}
+  {{ metric_card("Health", "Healthy" if health.ok else "Needs attention", "Overall runtime status") }}
+  {{ metric_card("Persistence Stores", persistence.stores|length if persistence.configured else 0, "Configured storage targets") }}
+  {{ metric_card("Security Signals", security.runtime_throttle.blocked_bucket_count if security.configured else 0, "Blocked runtime credential buckets right now") }}
+</section>

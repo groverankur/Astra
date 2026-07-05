@@ -1,0 +1,138 @@
+{% from "macros/ui.html" import audit_rows, info_tile, panel, select_field, submit_button %}
+{% call panel("Infrastructure, Keys, and Observability", "Persistence, public keys, and telemetry signals for this runtime.") %}
+<div class="info-tile-grid">
+  {{ info_tile("Stores", persistence.stores|length if persistence.configured else 0, "Configured persistence targets") }}
+  {{ info_tile("JWKS Keys", jwks["keys"]|length if jwks["keys"] is defined else 0, "Currently exported public keys") }}
+  {{ info_tile("Metrics", observability.counters|length if observability.configured else 0, "Named observability counters") }}
+  {{ info_tile("Correlation Header", observability.correlation_header_name if observability.configured else "-", "Header propagated through runtime responses") }}
+  {{ info_tile("Runtime Throttle Blocks", security.runtime_throttle.blocked_bucket_count if security.configured else 0, "Credential or verification buckets currently blocked") }}
+  {{ info_tile("Admin UI Throttle Blocks", security.admin_ui_throttle.blocked_bucket_count if security.configured else 0, "Operator login or action buckets currently blocked") }}
+  {{ info_tile("Plugin Audit Records", security.plugin_audit_record_count if security.configured else 0, "Recent hook and endpoint audit entries") }}
+</div>
+
+<form class="form-stack"
+      data-workspace-view="/partials/dashboard/infrastructure"
+      hx-get="/partials/dashboard/infrastructure"
+      hx-target="#workspace-tab-panel"
+      hx-swap="innerHTML">
+  <div class="overview-grid">
+    {{ select_field("throttle_scope", "Blocked throttle scope", [""] + security.runtime_throttle.available_scopes, current_security_throttle_scope) }}
+    {{ select_field("plugin_status", "Plugin audit status", [""] + security.available_plugin_statuses, current_plugin_audit_status) }}
+  </div>
+  <div class="button-grid">
+    {{ submit_button("Apply Filters", "primary") }}
+  </div>
+</form>
+
+<div class="overview-grid">
+  <div class="overview-card">
+    <h3>Persistence Stores</h3>
+    {% if persistence.configured and persistence.stores %}
+    <ul class="status-list">
+      {% for store in persistence.stores %}
+      <li>{{ store.store_name }} · {{ store.backend }} · {{ store.mode }}</li>
+      {% endfor %}
+    </ul>
+    {% else %}
+    <div class="empty-state">No persistence stores are available.</div>
+    {% endif %}
+  </div>
+  <div class="overview-card">
+    <h3>Observability Counters</h3>
+    {% if observability.configured and observability.counters %}
+    <ul class="status-list">
+      {% for counter in observability.counters %}
+      <li>{{ counter.name }} · {{ counter.value }}</li>
+      {% endfor %}
+    </ul>
+    {% else %}
+    <div class="empty-state">No counters have been recorded yet.</div>
+    {% endif %}
+  </div>
+</div>
+
+<div class="overview-grid">
+  <div class="overview-card">
+    <h3>Runtime Abuse Controls</h3>
+    {% if security.configured %}
+    <ul class="status-list">
+      <li>Throttle storage · {{ security.runtime_throttle.storage_kind }}</li>
+      <li>Tracked buckets · {{ security.runtime_throttle.bucket_count }}</li>
+      <li>Blocked buckets · {{ security.runtime_throttle.blocked_bucket_count }}</li>
+      {% if security.runtime_throttle.table_name %}<li>Store table · {{ security.runtime_throttle.table_name }}</li>{% endif %}
+    </ul>
+    {% else %}
+    <div class="empty-state">Runtime throttle diagnostics are not available.</div>
+    {% endif %}
+  </div>
+  <div class="overview-card">
+    <h3>Admin UI Abuse Controls</h3>
+    {% if security.configured %}
+    <ul class="status-list">
+      <li>Throttle storage · {{ security.admin_ui_throttle.storage_kind }}</li>
+      <li>Tracked buckets · {{ security.admin_ui_throttle.bucket_count }}</li>
+      <li>Blocked buckets · {{ security.admin_ui_throttle.blocked_bucket_count }}</li>
+    </ul>
+    {% else %}
+    <div class="empty-state">Admin UI throttle diagnostics are not available.</div>
+    {% endif %}
+  </div>
+</div>
+
+<div class="overview-grid">
+  <div class="overview-card">
+    <h3>Blocked Runtime Buckets</h3>
+    {% if security.configured and security.runtime_throttle.buckets %}
+    <ul class="status-list">
+      {% for bucket in security.runtime_throttle.buckets if bucket.blocked %}
+      <li>{{ bucket.scope }} · fingerprint {{ bucket.fingerprint }} · retry {{ bucket.retry_after_seconds }}s</li>
+      {% endfor %}
+      {% if not (security.runtime_throttle.buckets | selectattr("blocked") | list) %}
+      <li>No runtime buckets are currently blocked.</li>
+      {% endif %}
+    </ul>
+    {% else %}
+    <div class="empty-state">No runtime throttle data is available yet.</div>
+    {% endif %}
+  </div>
+  <div class="overview-card">
+    <h3>Recent Plugin Runtime Audit</h3>
+    {% if security.configured and security.recent_plugin_audit_records %}
+    <ul class="status-list">
+      {% for record in security.recent_plugin_audit_records[:8] %}
+      <li>{{ record.plugin_name }} · {{ record.execution_type }} · {{ record.status }} · {{ record.duration_ms }}ms</li>
+      {% endfor %}
+    </ul>
+    {% else %}
+    <div class="empty-state">No plugin audit entries have been recorded yet.</div>
+    {% endif %}
+  </div>
+</div>
+
+<details class="detail-panel">
+  <summary>Advanced diagnostics</summary>
+  <div class="split-grid three-up-grid stack-compact">
+    <details class="detail-panel">
+      <summary>Persistence details</summary>
+      <pre class="pretty-output pretty-green">{{ persistence | tojson(indent=2) }}</pre>
+    </details>
+    <details class="detail-panel">
+      <summary>JWKS payload</summary>
+      <pre class="pretty-output pretty-magenta">{{ jwks | tojson(indent=2) }}</pre>
+    </details>
+    <details class="detail-panel">
+      <summary>Observability payload</summary>
+      <pre class="pretty-output pretty-blue">{{ observability | tojson(indent=2) }}</pre>
+    </details>
+    <details class="detail-panel">
+      <summary>Security payload</summary>
+      <pre class="pretty-output pretty-magenta">{{ security | tojson(indent=2) }}</pre>
+    </details>
+  </div>
+</details>
+
+<div class="recent-list">
+  <div class="subheading">Recent Admin Actions</div>
+  {{ audit_rows(recent_admin_actions) }}
+</div>
+{% endcall %}

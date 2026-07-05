@@ -1,0 +1,23 @@
+{% if tuples %}
+<div class="audit-table" style="max-height: 350px; overflow-y: auto;">
+  {% for tuple in tuples %}
+  <article class="audit-row" style="padding: 8px; font-size: 0.9em; display: flex; justify-content: space-between; align-items: center;">
+    <div>
+      <code>{{ tuple.object_type }}:{{ tuple.object_id }}</code> 
+      <span style="color: var(--accent);">#{{ tuple.relation }}</span> 
+      <span>@</span> 
+      <code>{{ tuple.subject_type }}:{{ tuple.subject_id }}{% if tuple.subject_relation %}#{{ tuple.subject_relation }}{% endif %}</code>
+    </div>
+    <button class="btn btn-secondary" 
+            style="padding: 2px 8px; font-size: 0.8em;"
+            hx-post="/partials/dashboard/rebac/tuples/delete?id={{ tuple.id }}"
+            hx-target="#tuples-table-region"
+            hx-swap="innerHTML">
+      Delete
+    </button>
+  </article>
+  {% endfor %}
+</div>
+{% else %}
+<div class="empty-state">No relation tuples configured for this tenant.</div>
+{% endif %}

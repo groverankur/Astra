@@ -1,0 +1,99 @@
+﻿{% macro field(name, label, value='', placeholder='', type='text') -%}
+<div class="field">
+  <label for="{{ name }}">{{ label }}</label>
+  <input id="{{ name }}" class="input" name="{{ name }}" type="{{ type }}" value="{{ value }}" placeholder="{{ placeholder }}" />
+</div>
+{%- endmacro %}
+
+{% macro select_field(name, label, options, selected='') -%}
+<div class="field">
+  <label for="{{ name }}">{{ label }}</label>
+  <select id="{{ name }}" class="input" name="{{ name }}">
+    {% for option in options %}
+    <option value="{{ option }}" {% if option == selected %}selected{% endif %}>{{ option }}</option>
+    {% endfor %}
+  </select>
+</div>
+{%- endmacro %}
+
+{% macro submit_button(label, variant='primary') -%}
+<button class="btn btn-{{ variant }}" type="submit">{{ label }}</button>
+{%- endmacro %}
+
+{% macro nav_button(label, path, target, kind='sidebar', icon='', badge='') -%}
+<button class="nav-button nav-button--{{ kind }}"
+        hx-get="{{ path }}"
+        hx-target="{{ target }}"
+        hx-swap="innerHTML"
+        data-panel-target="{{ target }}"
+        data-nav-view="{{ path }}"
+        aria-controls="{{ target | replace('#', '') }}"
+        type="button">
+  {% if icon %}<span class="nav-button__icon" aria-hidden="true">{{ icon }}</span>{% endif %}
+  <span class="nav-button__label">{{ label }}</span>
+  {% if badge %}<span class="nav-button__badge">{{ badge }}</span>{% endif %}
+</button>
+{%- endmacro %}
+
+{% macro panel(title, description='') -%}
+<section class="panel">
+  <div class="panel-header">
+    <h2>{{ title }}</h2>
+    {% if description %}<p>{{ description }}</p>{% endif %}
+  </div>
+  {{ caller() }}
+</section>
+{%- endmacro %}
+
+{% macro metric_card(label, value, description='') -%}
+<div class="metric-card">
+  <div class="label">{{ label }}</div>
+  <div class="metric-value">{{ value }}</div>
+  {% if description %}<div class="metric-caption">{{ description }}</div>{% endif %}
+</div>
+{%- endmacro %}
+
+{% macro info_tile(title, value, description='') -%}
+<article class="info-tile">
+  <div class="label">{{ title }}</div>
+  <div class="info-tile-value">{{ value }}</div>
+  {% if description %}<div class="metric-caption">{{ description }}</div>{% endif %}
+</article>
+{%- endmacro %}
+
+{% macro status_list(items) -%}
+<ul class="status-list">
+  {% for item in items %}
+  <li>{{ item }}</li>
+  {% endfor %}
+  {% if not items %}
+  <li>No runtime details available.</li>
+  {% endif %}
+</ul>
+{%- endmacro %}
+
+{% macro audit_rows(records) -%}
+<div class="audit-table">
+  {% if records %}
+    {% for record in records %}
+    <article class="audit-row">
+      <div class="audit-row-top">
+        <strong>{{ record.event_type }}</strong>
+        <span class="audit-status" data-status="{{ record.status }}">{{ record.status }}</span>
+      </div>
+      <div class="audit-row-meta">
+        <span>{{ record.timestamp }}</span>
+        {% if record.tenant_id %}<span>{{ record.tenant_id }}</span>{% endif %}
+        {% if record.provider_id %}<span>{{ record.provider_id }}</span>{% endif %}
+        {% if record.actor_username %}<span>{{ record.actor_username }}</span>{% endif %}
+      </div>
+      {% if record.details %}
+      <pre class="audit-details">{{ record.details | tojson(indent=2) }}</pre>
+      {% endif %}
+    </article>
+    {% endfor %}
+  {% else %}
+    <div class="empty-state">No records found for the current filter.</div>
+  {% endif %}
+</div>
+{%- endmacro %}

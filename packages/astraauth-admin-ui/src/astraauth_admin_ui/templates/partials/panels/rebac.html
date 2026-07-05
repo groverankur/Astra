@@ -1,0 +1,100 @@
+{% from "macros/ui.html" import panel, field, submit_button %}
+{% call panel("ReBAC Access Policy Playground", "Author schemas, write relation tuples, and audit access checks in real-time.") %}
+
+<div class="overview-grid">
+  <!-- Column 1: Schema Editor -->
+  <div class="overview-card">
+    <h3>Zanzibar-style Schema Compiler</h3>
+    <p class="sidebar-copy" style="margin-bottom: 12px;">Define your entity hierarchy, relations, and permissions rules using KeyNetra-style DSL.</p>
+    
+    <form hx-post="/partials/dashboard/rebac/schema/compile"
+          hx-target="#schema-feedback-region"
+          hx-swap="innerHTML">
+      <div class="field">
+        <label for="dsl">Schema DSL</label>
+        <textarea id="dsl" class="input" name="dsl" rows="12" style="font-family: monospace; width: 100%; padding: 8px; border-radius: 4px; border: 1px solid var(--border); background: var(--bg-card); color: var(--text);">{{ dsl }}</textarea>
+      </div>
+      <div style="margin-top: 12px;">
+        {{ submit_button("Compile & Save Schema", "primary") }}
+      </div>
+    </form>
+
+    <div id="schema-feedback-region" style="margin-top: 12px;">
+      <!-- Compile response messages and active definitions node map will load here -->
+    </div>
+  </div>
+
+  <!-- Column 2: Check Permission Console -->
+  <div class="overview-card">
+    <h3>Permission Check Evaluator</h3>
+    <p class="sidebar-copy" style="margin-bottom: 12px;">Evaluate permissions or relations dynamically against the active schema rules and relationship facts.</p>
+
+    <form hx-post="/partials/dashboard/rebac/check"
+          hx-target="#check-results-region"
+          hx-swap="innerHTML">
+      <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px;">
+        {{ field("subject_type", "Subject Type", placeholder="e.g. user") }}
+        {{ field("subject_id", "Subject ID", placeholder="e.g. alice") }}
+      </div>
+      <div style="margin-top: 8px;">
+        {{ field("relation_or_permission", "Relation or Permission", placeholder="e.g. view") }}
+      </div>
+      <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-top: 8px;">
+        {{ field("object_type", "Object Type", placeholder="e.g. document") }}
+        {{ field("object_id", "Object ID", placeholder="e.g. 1") }}
+      </div>
+
+      <div style="margin-top: 12px;">
+        {{ submit_button("Evaluate Check", "primary") }}
+      </div>
+    </form>
+
+    <div id="check-results-region" style="margin-top: 12px;">
+      <!-- Access check green/red response banner will load here -->
+    </div>
+  </div>
+</div>
+
+<div class="overview-grid" style="margin-top: 16px;">
+  <!-- Column 3: Tuple Management -->
+  <div class="overview-card" style="grid-column: span 2;">
+    <h3>Relational Tuples Playground</h3>
+    <p class="sidebar-copy" style="margin-bottom: 12px;">Write facts asserting relations between subjects and objects. Example: <code>(user:bob, owner, folder:sub)</code></p>
+    
+    <div style="display: grid; grid-template-columns: 1.5fr 2fr; gap: 16px;">
+      <!-- Add Tuple Form -->
+      <div>
+        <form hx-post="/partials/dashboard/rebac/tuples/add"
+              hx-target="#tuples-table-region"
+              hx-swap="innerHTML"
+              class="sidebar-form"
+              style="padding: 12px; border: 1px solid var(--border); border-radius: 4px; background: var(--bg-panel);">
+          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 6px;">
+            {{ field("obj_type", "Object Type", placeholder="document") }}
+            {{ field("obj_id", "Object ID", placeholder="1") }}
+          </div>
+          <div style="margin-top: 6px;">
+            {{ field("rel", "Relation", placeholder="editor") }}
+          </div>
+          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 6px; margin-top: 6px;">
+            {{ field("sub_type", "Subject Type", placeholder="user") }}
+            {{ field("sub_id", "Subject ID", placeholder="alice") }}
+          </div>
+          <div style="margin-top: 6px;">
+            {{ field("sub_rel", "Subject Relation (Optional)", placeholder="member") }}
+          </div>
+          <div style="margin-top: 12px;">
+            <button class="btn btn-secondary btn-block" type="submit">Add Relation Tuple</button>
+          </div>
+        </form>
+      </div>
+
+      <!-- Tuples List Table -->
+      <div id="tuples-table-region">
+        {% include "partials/panels/rebac_tuples_list.html" %}
+      </div>
+    </div>
+  </div>
+</div>
+
+{% endcall %}

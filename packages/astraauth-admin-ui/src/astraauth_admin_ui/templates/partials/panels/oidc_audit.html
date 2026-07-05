@@ -1,0 +1,14 @@
+﻿{% from "macros/ui.html" import field, panel, submit_button, audit_rows %}
+{% call panel("OIDC Audit", "Inspect federation activity by tenant and provider.") %}
+<form class="inline-form"
+      data-workspace-view="/partials/dashboard/oidc-audit"
+      hx-get="/partials/dashboard/oidc-audit"
+      hx-target="#workspace-tab-panel"
+      hx-swap="innerHTML">
+  {{ field("tenant_id", "Tenant ID", audit_tenant_id, "Tenant ID") }}
+  {{ field("provider_id", "Provider ID", audit_provider_id, "Optional provider ID") }}
+  {{ submit_button("Load OIDC Audit", "warning") }}
+</form>
+
+{{ audit_rows(oidc_records) }}
+{% endcall %}

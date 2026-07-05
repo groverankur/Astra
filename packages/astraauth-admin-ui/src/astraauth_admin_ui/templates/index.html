@@ -1,0 +1,22 @@
+{% extends "base.html" %}
+
+{% block body %}
+<div class="dashboard-layout" data-dashboard-layout>
+  <aside id="sidebar-region" class="dashboard-sidebar"
+         hx-get="/partials/sidebar"
+         hx-trigger="load"
+         hx-swap="innerHTML"></aside>
+
+  <main class="dashboard-main">
+    <div id="status-region" class="status-host">
+      {% include "partials/status_banner.html" %}
+    </div>
+    <div id="main-region"
+         hx-get="/partials/main"
+         hx-trigger="load"
+         hx-swap="innerHTML">
+      <div class="panel loading-panel">Loading admin workspace...</div>
+    </div>
+  </main>
+</div>
+{% endblock %}

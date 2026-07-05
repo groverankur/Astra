@@ -1,0 +1,22 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>{{ page_title }}</title>
+    <link rel="stylesheet" href="{{ url_for('static', path='vendor/basecoat/basecoat.min.css') }}" />
+    <link rel="stylesheet" href="{{ url_for('static', path='admin.css') }}" />
+    {% block head %}{% endblock %}
+  </head>
+  <body>
+    <button class="theme-toggle" type="button" aria-label="Toggle color theme" data-theme-toggle>
+      <span class="theme-toggle__icon theme-toggle__icon--light">☀</span>
+      <span class="theme-toggle__icon theme-toggle__icon--dark">☾</span>
+    </button>
+    {% block body %}{% endblock %}
+    <script src="{{ url_for('static', path='vendor/htmx/htmx.min.js') }}" defer></script>
+    <script src="{{ url_for('static', path='vendor/basecoat/js/all.min.js') }}" defer></script>
+    <script src="{{ url_for('static', path='admin.js') }}" defer></script>
+    {% block scripts %}{% endblock %}
+  </body>
+</html>

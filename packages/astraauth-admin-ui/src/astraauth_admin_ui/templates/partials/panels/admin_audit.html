@@ -1,0 +1,14 @@
+﻿{% from "macros/ui.html" import field, panel, submit_button, audit_rows %}
+{% call panel("Admin Audit", "Review operator actions and current audit history.") %}
+<form class="inline-form"
+      data-workspace-view="/partials/dashboard/admin-audit"
+      hx-get="/partials/dashboard/admin-audit"
+      hx-target="#workspace-tab-panel"
+      hx-swap="innerHTML">
+  {{ field("tenant_id", "Tenant Filter", admin_audit_tenant, "Optional tenant") }}
+  {{ field("actor_username", "Actor Username", admin_audit_actor, "Optional username") }}
+  {{ submit_button("Load Admin Audit", "violet") }}
+</form>
+
+{{ audit_rows(admin_records) }}
+{% endcall %}

@@ -1,0 +1,47 @@
+[project]
+name = "astraauth-admin-ui"
+version = "1.0.0"
+description = "Astra Netra (`astraauth-admin-ui`): FastAPI-based browser admin UI for Astra with Jinja, Basecoat, and htmx partial updates"
+readme = "README.md"
+requires-python = ">=3.12"
+authors = [
+    { name = "Ankur Grover", email = "grover.ankur@gmail.com" }
+]
+classifiers = [
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.13",
+    "Programming Language :: Python :: 3.14",
+    "Typing :: Typed",
+    "Framework :: FastAPI",
+]
+keywords = ["authentication", "authorization", "admin-ui", "fastapi", "security"]
+dependencies = [
+    "astraauth>=1.0.0",
+    
+    "fastapi[standard-no-fastapi-cloud-cli]>=0.121.1",
+    "jinja2>=3.1.6",
+    "uvicorn>=0.38.0",
+]
+
+[project.urls]
+Homepage = "https://astraauth.dev"
+Repository = "https://github.com/groverankur/Astra"
+Documentation = "https://docs.astraauth.dev"
+
+[project.scripts]
+astraauth-admin-ui = "astraauth_admin_ui.__main__:main"
+
+[dependency-groups]
+dev = [
+    "ty>=0.0.51",
+    "pre-commit>=4.5.1",
+    "pytest>=8.0.0",
+    "pytest-asyncio>=0.23.0",
+    "pytest-cov>=4.1.0",
+    "ruff>=0.14.11",
+]
+
+[build-system]
+requires = ["uv_build>=0.11.7,<0.12.0"]
+build-backend = "uv_build"

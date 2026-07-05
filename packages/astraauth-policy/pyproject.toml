@@ -1,0 +1,30 @@
+[project]
+name = "astraauth-policy"
+version = "1.0.0"
+description = "Astra Niyam (`astraauth-policy`): relationship-based access control (ReBAC) system context, compiler and check engine for Astra"
+readme = "README.md"
+requires-python = ">=3.12"
+authors = [
+    { name = "Ankur Grover", email = "grover.ankur@gmail.com" }
+]
+classifiers = [
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.13",
+    "Programming Language :: Python :: 3.14",
+    "Typing :: Typed",
+]
+keywords = ["authentication", "authorization", "rebac", "policy", "zanzibar"]
+
+dependencies = [
+    "astraauth>=1.0.0",
+]
+
+[project.urls]
+Homepage = "https://astraauth.dev"
+Repository = "https://github.com/groverankur/Astra"
+Documentation = "https://docs.astraauth.dev"
+
+[build-system]
+requires = ["uv_build>=0.11.7,<0.12.0"]
+build-backend = "uv_build"

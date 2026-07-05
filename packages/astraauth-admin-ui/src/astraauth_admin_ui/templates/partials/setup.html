@@ -1,0 +1,62 @@
+{% from "macros/ui.html" import field, panel, select_field, submit_button %}
+<section class="workspace-stack">
+  <div class="callout callout-warn">
+    <h2>Initial Setup Required</h2>
+    <p>No bootstrap admin is configured yet. Use a short-lived bootstrap token from the CLI to initialize config and create the first operator admin.</p>
+  </div>
+
+  <div class="overview-grid">
+    <div class="overview-card">
+      <h3>Recommended Order</h3>
+      <ol class="status-list ordered-list">
+        <li>Generate a bootstrap setup token with the CLI.</li>
+        <li>Initialize config for the target environment.</li>
+        <li>Create the first bootstrap admin.</li>
+        <li>Sign in and confirm health from the dashboard.</li>
+      </ol>
+    </div>
+    <div class="overview-card">
+      <h3>What You Need</h3>
+      <ul class="status-list">
+        <li>A short-lived bootstrap token</li>
+        <li>A tenant ID for the first operator</li>
+        <li>An issuer value that matches your deployment plan</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="two-up">
+    {% call panel("Config Wizard", "Create the runtime configuration for this environment.") %}
+    <form class="form-stack"
+          hx-post="/partials/actions/config-init"
+          hx-target="#main-region"
+          hx-swap="innerHTML">
+      <input type="hidden" name="csrf_token" value="{{ csrf_token }}" />
+      {{ field("bootstrap_token", "Bootstrap setup token", "", "Bootstrap setup token") }}
+      {{ field("project_name", "Project name", "Astra", "Project name") }}
+      {{ select_field("environment", "Environment", ["dev", "test", "prod"], "dev") }}
+      {{ select_field("persistence_backend", "Persistence backend", ["sqlite", "postgres", "mysql"], "sqlite") }}
+      {{ field("issuer", "Issuer", "https://auth.local", "Issuer") }}
+      <input type="hidden" name="encrypt_values" value="true" />
+      {{ submit_button("Initialize Config", "primary") }}
+    </form>
+    {% endcall %}
+
+    {% call panel("Create First Admin", "Save the bootstrap admin used for first operator login.") %}
+    <form class="form-stack"
+          hx-post="/partials/actions/init-admin"
+          hx-target="#main-region"
+          hx-swap="innerHTML">
+      <input type="hidden" name="csrf_token" value="{{ csrf_token }}" />
+      {{ field("bootstrap_token", "Bootstrap setup token", "", "Bootstrap setup token") }}
+      {{ field("tenant_id", "Tenant ID", "tenant-1", "Tenant ID") }}
+      {{ field("username", "Admin username", "admin", "Admin username") }}
+      {{ field("password", "Admin password", "", "Admin password", type="password") }}
+      {{ field("email", "Admin email", "admin@example.com", "Admin email") }}
+      <input type="hidden" name="role_name" value="admin" />
+      <input type="hidden" name="client_id" value="bootstrap-admin-client" />
+      {{ submit_button("Save Bootstrap Admin", "success") }}
+    </form>
+    {% endcall %}
+  </div>
+</section>

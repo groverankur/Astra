@@ -1,0 +1,7 @@
+﻿{% if status_message %}
+<div class="banner" data-kind="{{ status_kind|default('info') }}">
+  {{ status_message }}
+</div>
+{% else %}
+<div class="banner hidden"></div>
+{% endif %}

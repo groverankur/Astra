@@ -1,0 +1,21 @@
+{% from "macros/ui.html" import field, submit_button %}
+<section class="workspace-card workspace-card-centered">
+  <div class="panel-header">
+    <h2>Admin Sign In</h2>
+    <p>Use an operator admin account to unlock the runtime dashboard.</p>
+  </div>
+  <div class="callout">
+    <strong>Before you sign in</strong>
+    <p class="sidebar-small">Make sure config is initialized and that a bootstrap admin already exists for the tenant you want to operate.</p>
+  </div>
+  <form class="form-stack"
+        hx-post="/partials/session/login"
+        hx-target="#main-region"
+        hx-swap="innerHTML">
+    <input type="hidden" name="csrf_token" value="{{ csrf_token }}" />
+    {{ field("tenant_id", "Tenant ID", "tenant-1", "Tenant ID") }}
+    {{ field("username", "Username", "admin", "Username") }}
+    {{ field("password", "Password", "", "Password", type="password") }}
+    {{ submit_button("Sign In", "primary") }}
+  </form>
+</section>

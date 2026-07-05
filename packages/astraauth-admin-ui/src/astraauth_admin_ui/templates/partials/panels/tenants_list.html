@@ -1,0 +1,22 @@
+{% if tenants %}
+<div class="audit-table" style="max-height: 350px; overflow-y: auto;">
+  {% for tenant in tenants %}
+  <article class="audit-row" style="padding: 10px; font-size: 0.95em; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--border);">
+    <div>
+      <strong style="color: var(--text);">{{ tenant.name }}</strong> (<code>{{ tenant.tenant_id }}</code>)<br/>
+      <span style="font-size: 0.85em; color: var(--accent); word-break: break-all;">DB: {{ tenant.database_url }}</span><br/>
+      <span style="font-size: 0.85em; color: var(--text-muted);">Limits &mdash; Users: {{ tenant.max_users }} · Relation Tuples: {{ tenant.max_relation_tuples }}</span>
+    </div>
+    <button class="btn btn-secondary" 
+            style="padding: 4px 10px; font-size: 0.85em;"
+            hx-post="/partials/dashboard/tenants/delete?tenant_id={{ tenant.tenant_id }}"
+            hx-target="#tenants-table-region"
+            hx-swap="innerHTML">
+      Delete
+    </button>
+  </article>
+  {% endfor %}
+</div>
+{% else %}
+<div class="empty-state">No tenant workspaces configured.</div>
+{% endif %}
