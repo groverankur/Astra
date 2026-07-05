@@ -201,7 +201,7 @@ zeromq = [
 dev = [
     { name = "bandit" },
     { name = "markdown-meta-extension" },
-    { name = "mkdocstrings-python" },
+    { name = "mkdocstrings", extra = ["python"] },
     { name = "pip-audit" },
     { name = "pre-commit" },
     { name = "pytest" },
@@ -264,7 +264,7 @@ provides-extras = ["otp", "redis", "sqlite", "postgres", "mysql", "sql-async", "
 dev = [
     { name = "bandit", extras = ["toml"], specifier = ">=1.8.6" },
     { name = "markdown-meta-extension", specifier = ">=0.5.3" },
-    { name = "mkdocstrings-python", specifier = ">=1.18.2" },
+    { name = "mkdocstrings", extras = ["python"], specifier = ">=1.0.4" },
     { name = "pip-audit", specifier = ">=2.9.0" },
     { name = "pre-commit", specifier = ">=4.5.1" },
     { name = "pytest", specifier = ">=8.0.0" },
@@ -1641,6 +1641,11 @@ dependencies = [
 sdist = { url = "https://files.pythonhosted.org/packages/1d/5d/f888d4d3eb31359b327bc9b17a212d6ef03fe0b0682fbb3fc2cb849fb12b/mkdocstrings-1.0.4.tar.gz", hash = "sha256:3969a6515b77db65fd097b53c1b7aa4ae840bd71a2ee62a6a3e89503446d7172", size = 100088, upload-time = "2026-04-15T09:16:53.376Z" }
 wheels = [
     { url = "https://files.pythonhosted.org/packages/6e/94/be70f8ee9c45f2f62b39a1f0e9303bc20e138a8f3b8e50ffd89498e177e1/mkdocstrings-1.0.4-py3-none-any.whl", hash = "sha256:63464b4b29053514f32a1dbbf604e52876d5e638111b0c295ab7ed3cac73ca9b", size = 35560, upload-time = "2026-04-15T09:16:51.436Z" },
+]
+
+[package.optional-dependencies]
+python = [
+    { name = "mkdocstrings-python" },
 ]
 
 [[package]]
