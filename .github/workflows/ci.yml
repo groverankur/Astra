@@ -54,15 +54,32 @@ jobs:
     if: github.ref == 'refs/heads/main' && github.event_name == 'push'
     runs-on: ubuntu-latest
     permissions:
-      contents: write
+      contents: read
+      pages: write
+      id-token: write
     steps:
       - name: Checkout Repository
         uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
 
-      - name: Build & Publish Zensical Docs
-        uses: cssnr/zensical-action@fd73e847ab603a83970fc530a3a17c19fa19e407 # v1.0.8
+      - name: Install uv Package Manager
+        uses: astral-sh/setup-uv@fac544c07dec837d0ccb6301d7b5580bf5edae39 # v8.2.0
         with:
-          github_token: ${{ secrets.GITHUB_TOKEN }}
-          prepare: |
-            uv tool install --force --with mkdocstrings --with mkdocstrings-python zensical==$ZENSICAL_VERSION
-            /home/runner/.local/share/uv/tools/zensical/bin/python -m pip install -e . -e ./packages/astraauth-policy -e ./packages/astraauth-tenancy -e ./packages/astraauth-cli -e ./packages/astraauth-admin-ui -e ./packages/astraauth-plugins
+          enable-cache: true
+          version: "latest"
+
+      - name: Install Python 3.12
+        run: uv python install 3.12
+
+      - name: Synchronize Workspace dependencies
+        run: uv sync --all-groups --all-extras
+
+      - name: Build Zensical Docs
+        run: uv run zensical build -c
+
+      - name: Upload Artifact
+        uses: actions/upload-pages-artifact@56afc609e74202658d3ffba0e8f6dda462b719fa # v3.0.1
+        with:
+          path: site
+
+      - name: Deploy to GitHub Pages
+        uses: actions/deploy-pages@d6db90164ac5ed86f2b6aed7e0febac5b3c0c03e # v4.0.5
