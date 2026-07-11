@@ -2,18 +2,18 @@
 
 This changelog maps the implementation phases to release-style version milestones.
 
-## 1.0.0 - 2026-07-05
+## 1.0.0 - 2026-07-11
 
-### First production-ready public release
-- **Package Consolidation**: Consolidated all modular package namespaces (`astraauth-core`, `astraauth-service`, `astraauth-adapters`, `astraauth-idp`, `astraauth-webauthn`) into a single unified `astraauth` root package (with submodules `core`, `service`, `adapters`, `idp`, `webauthn`, and `plugins`) for simplified installation and consistent namespaces.
-- **ReBAC Policy Engine**: Implemented **Astra Niyam (`astraauth-policy`)** providing Zanzibar-inspired schema compiling and graph traversal check engine.
+### Unified Branding & Production Launch
+- **Official Sanskrit Branding**: Established public names for all active modules (Astra Yantra, Sutra, Setu, Tantra, Pramaan, Mudra, Niyam, Mandal, Dwaar, Netra) to express the structural soul of the platform.
+- **Dependency Injection Guide**: Added robust, native, and third-party DI examples for **FastAPI**, **Flask**, **Django**, **Robyn**, **Litestar**, and **Dishka** in the user-guide.
+- **ReBAC Policy Engine**: Implemented **Astra Niyam (`astraauth-policy`)** providing Zanzibar-inspired schema compiling and CheckEngine graph solver.
 - **Multi-Tenancy Isolation**: Implemented **Astra Mandal (`astraauth-tenancy`)** providing async/thread-safe dynamic tenant context-bindings and routing middleware.
-- **Admin UI Console**: Updated **Astra Netra (`astraauth-admin-ui`)** to add interactive ReBAC policy authoring view, schema validator nodes, and checking console.
+- **Admin UI Console**: Hardened **Astra Netra (`astraauth-admin-ui`)** to add interactive ReBAC policy authoring view, schema validator nodes, and checking console.
+- **Layout & Quality Passes**: Cleaned up the Repository Layout diagrams (including E2E examples directory), fixed Mermaid rendering syntax errors, and deprecated outdated status reports.
 - **Framework Integration Adapters**: Rewrote framework examples (ASGI, Flask, Django, Litestar, Robyn) to run as full E2E mock client verification suites.
-- completed release-readiness hardening across redaction, encrypted bootstrap export, plugin trust policy, WebAuthn verifier safety, config key custody, adapter origin policy, admin UI readability, and supported-framework examples.
-- documented ASGI, FastAPI, Flask, Django, Litestar, and Robyn as supported adapters with package-oriented examples.
-- added strict release verification evidence for Ruff, Ty, package tests, docs, Bandit, pip-audit, package builds, Twine metadata checks, and install smoke tests.
-- promoted `astraauth-admin-ui` into the publishable package set with operator-focused docs and examples.
+- Added strict release verification evidence for Ruff, Ty, package tests, docs, Bandit, pip-audit, package builds, Twine metadata checks, and install smoke tests.
+- Promoted `astraauth-admin-ui` into the publishable package set with operator-focused docs and examples.
 ## 0.5.3 - 2026-05-13
 
 ### Security hardening and operator diagnostics

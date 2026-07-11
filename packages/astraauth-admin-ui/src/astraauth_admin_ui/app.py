@@ -272,49 +272,48 @@ def create_admin_app(*, home: Path | None = None) -> FastAPI:  # noqa: C901
         return _attach_session_cookie(response, request=request, home=target_home)
 
     @app.get("/partials/dashboard/summary")
-    def partial_dashboard_summary(request: Request) -> Response:
+    async def partial_dashboard_summary(request: Request) -> Response:
         _require_admin(request, home=target_home)
-        return _template_response(
-            request=request,
-            home=target_home,
-            templates=templates,
-            template_name="partials/panels/summary_cards.html",
-            context=_dashboard_panel_context(home=target_home),
-        )
+        from htmy import Renderer
+
+        from astraauth_admin_ui.components import SummaryCardsPanel
+
+        ctx = _dashboard_panel_context(home=target_home)
+        html_str = await Renderer().render(SummaryCardsPanel(ctx))
+        return Response(content=html_str, media_type="text/html")
 
     @app.get("/partials/dashboard/runtime")
-    def partial_dashboard_runtime(request: Request) -> Response:
+    async def partial_dashboard_runtime(request: Request) -> Response:
         _require_admin(request, home=target_home)
-        return _template_response(
-            request=request,
-            home=target_home,
-            templates=templates,
-            template_name="partials/panels/runtime_overview.html",
-            context=_dashboard_panel_context(home=target_home),
-        )
+        from htmy import Renderer
+
+        from astraauth_admin_ui.components import RuntimeOverviewPanel
+
+        ctx = _dashboard_panel_context(home=target_home)
+        html_str = await Renderer().render(RuntimeOverviewPanel(ctx))
+        return Response(content=html_str, media_type="text/html")
 
     @app.get("/partials/dashboard/infrastructure")
-    def partial_dashboard_infrastructure(
+    async def partial_dashboard_infrastructure(
         request: Request,
         throttle_scope: str | None = None,
         plugin_status: str | None = None,
     ) -> Response:
         _require_admin(request, home=target_home)
+        from htmy import Renderer
+
+        from astraauth_admin_ui.components import InfrastructurePanel
+
         context = _dashboard_panel_context(
             home=target_home,
             throttle_scope=throttle_scope or "",
             plugin_status=plugin_status or "",
         )
-        return _template_response(
-            request=request,
-            home=target_home,
-            templates=templates,
-            template_name="partials/panels/infrastructure.html",
-            context=context,
-        )
+        html_str = await Renderer().render(InfrastructurePanel(context))
+        return Response(content=html_str, media_type="text/html")
 
     @app.get("/partials/dashboard/oidc-audit")
-    def partial_dashboard_oidc_audit(
+    async def partial_dashboard_oidc_audit(
         request: Request,
         tenant_id: str | None = None,
         provider_id: str | None = None,
@@ -324,20 +323,20 @@ def create_admin_app(*, home: Path | None = None) -> FastAPI:  # noqa: C901
         records = list_oidc_audit_records(
             home=target_home, tenant_id=actual_tenant_id, provider_id=provider_id
         )
-        return _template_response(
-            request=request,
-            home=target_home,
-            templates=templates,
-            template_name="partials/panels/oidc_audit.html",
-            context={
-                "audit_tenant_id": actual_tenant_id,
-                "audit_provider_id": provider_id or "",
-                "oidc_records": list(records),
-            },
-        )
+        from htmy import Renderer
+
+        from astraauth_admin_ui.components import OidcAuditPanel
+
+        ctx = {
+            "audit_tenant_id": actual_tenant_id,
+            "audit_provider_id": provider_id or "",
+            "oidc_records": list(records),
+        }
+        html_str = await Renderer().render(OidcAuditPanel(ctx))
+        return Response(content=html_str, media_type="text/html")
 
     @app.get("/partials/dashboard/admin-audit")
-    def partial_dashboard_admin_audit(
+    async def partial_dashboard_admin_audit(
         request: Request,
         tenant_id: str | None = None,
         actor_username: str | None = None,
@@ -349,17 +348,17 @@ def create_admin_app(*, home: Path | None = None) -> FastAPI:  # noqa: C901
             tenant_id=actual_tenant_id if tenant_id is not None else None,
             actor_username=actor_username,
         )
-        return _template_response(
-            request=request,
-            home=target_home,
-            templates=templates,
-            template_name="partials/panels/admin_audit.html",
-            context={
-                "admin_audit_tenant": actual_tenant_id if tenant_id is not None else "",
-                "admin_audit_actor": actor_username or "",
-                "admin_records": list(records),
-            },
-        )
+        from htmy import Renderer
+
+        from astraauth_admin_ui.components import AdminAuditPanel
+
+        ctx = {
+            "admin_audit_tenant": actual_tenant_id if tenant_id is not None else "",
+            "admin_audit_actor": actor_username or "",
+            "admin_records": list(records),
+        }
+        html_str = await Renderer().render(AdminAuditPanel(ctx))
+        return Response(content=html_str, media_type="text/html")
 
     def _load_tenant_tuples(home: Path, tenant_id: str) -> list[dict]:
         import json
@@ -402,7 +401,7 @@ def create_admin_app(*, home: Path | None = None) -> FastAPI:  # noqa: C901
             pass
 
     @app.get("/partials/dashboard/rebac")
-    def partial_dashboard_rebac(request: Request) -> Response:
+    async def partial_dashboard_rebac(request: Request) -> Response:
         principal = _require_admin(request, home=target_home)
 
         # Load active schema
@@ -422,17 +421,21 @@ def create_admin_app(*, home: Path | None = None) -> FastAPI:  # noqa: C901
             )
             schema_file.write_text(dsl, encoding="utf-8")
 
-        tuples = _load_tenant_tuples(target_home, principal.tenant_id)
-        return _template_response(
-            request=request,
-            home=target_home,
-            templates=templates,
-            template_name="partials/panels/rebac.html",
-            context={
-                "dsl": dsl,
-                "tuples": tuples,
-            },
-        )
+        raw_tuples = _load_tenant_tuples(target_home, principal.tenant_id)
+        from astraauth_policy import RelationTuple
+
+        tuples = [RelationTuple(**t) for t in raw_tuples]
+
+        from htmy import Renderer
+
+        from astraauth_admin_ui.components import RebacPanel
+
+        ctx = {
+            "dsl": dsl,
+            "tuples": tuples,
+        }
+        html_str = await Renderer().render(RebacPanel(ctx))
+        return Response(content=html_str, media_type="text/html")
 
     @app.post("/partials/dashboard/rebac/schema/compile")
     async def partial_rebac_compile(request: Request) -> Response:
@@ -500,15 +503,16 @@ def create_admin_app(*, home: Path | None = None) -> FastAPI:  # noqa: C901
         sub_id = str(form.get("sub_id", "")).strip()
         sub_rel = str(form.get("sub_rel", "")).strip() or None
 
+        from astraauth_policy import RelationTuple
+        from htmy import Renderer
+
+        from astraauth_admin_ui.components import RebacTuplesList
+
         if not obj_type or not obj_id or not relation or not sub_type or not sub_id:
-            tuples = _load_tenant_tuples(target_home, principal.tenant_id)
-            return _template_response(
-                request=request,
-                home=target_home,
-                templates=templates,
-                template_name="partials/panels/rebac_tuples_list.html",
-                context={"tuples": tuples},
-            )
+            raw_tuples = _load_tenant_tuples(target_home, principal.tenant_id)
+            tuples = [RelationTuple(**t) for t in raw_tuples]
+            html_str = await Renderer().render(RebacTuplesList(tuples))
+            return Response(content=html_str, media_type="text/html")
 
         import uuid
 
@@ -524,28 +528,27 @@ def create_admin_app(*, home: Path | None = None) -> FastAPI:  # noqa: C901
         }
         _save_tuple(target_home, new_tuple)
 
-        tuples = _load_tenant_tuples(target_home, principal.tenant_id)
-        return _template_response(
-            request=request,
-            home=target_home,
-            templates=templates,
-            template_name="partials/panels/rebac_tuples_list.html",
-            context={"tuples": tuples},
-        )
+        raw_tuples = _load_tenant_tuples(target_home, principal.tenant_id)
+        tuples = [RelationTuple(**t) for t in raw_tuples]
+        html_str = await Renderer().render(RebacTuplesList(tuples))
+        return Response(content=html_str, media_type="text/html")
 
     @app.post("/partials/dashboard/rebac/tuples/delete")
     async def partial_rebac_tuples_delete(request: Request, id: str) -> Response:
         principal = _require_admin(request, home=target_home)
         _delete_tuple_file(target_home, principal.tenant_id, id)
 
-        tuples = _load_tenant_tuples(target_home, principal.tenant_id)
-        return _template_response(
-            request=request,
-            home=target_home,
-            templates=templates,
-            template_name="partials/panels/rebac_tuples_list.html",
-            context={"tuples": tuples},
-        )
+        raw_tuples = _load_tenant_tuples(target_home, principal.tenant_id)
+        from astraauth_policy import RelationTuple
+
+        tuples = [RelationTuple(**t) for t in raw_tuples]
+
+        from htmy import Renderer
+
+        from astraauth_admin_ui.components import RebacTuplesList
+
+        html_str = await Renderer().render(RebacTuplesList(tuples))
+        return Response(content=html_str, media_type="text/html")
 
     @app.post("/partials/dashboard/rebac/check")
     async def partial_rebac_check(request: Request) -> Response:
@@ -658,18 +661,18 @@ def create_admin_app(*, home: Path | None = None) -> FastAPI:  # noqa: C901
         tenants_file.write_text(json.dumps(data, indent=2), encoding="utf-8")
 
     @app.get("/partials/dashboard/tenants")
-    def partial_dashboard_tenants(request: Request) -> Response:
+    async def partial_dashboard_tenants(request: Request) -> Response:
         _require_admin(request, home=target_home)
         tenants = _load_tenants(target_home)
-        return _template_response(
-            request=request,
-            home=target_home,
-            templates=templates,
-            template_name="partials/panels/tenants.html",
-            context={
-                "tenants": tenants,
-            },
-        )
+        from htmy import Renderer
+
+        from astraauth_admin_ui.components import TenantsPanel
+
+        ctx = {
+            "tenants": tenants,
+        }
+        html_str = await Renderer().render(TenantsPanel(ctx))
+        return Response(content=html_str, media_type="text/html")
 
     @app.post("/partials/dashboard/tenants/add")
     async def partial_tenants_add(request: Request) -> Response:
@@ -700,13 +703,12 @@ def create_admin_app(*, home: Path | None = None) -> FastAPI:  # noqa: C901
             _save_tenant(target_home, new_tenant)
 
         tenants = _load_tenants(target_home)
-        return _template_response(
-            request=request,
-            home=target_home,
-            templates=templates,
-            template_name="partials/panels/tenants_list.html",
-            context={"tenants": tenants},
-        )
+        from htmy import Renderer
+
+        from astraauth_admin_ui.components import TenantsList
+
+        html_str = await Renderer().render(TenantsList(tenants))
+        return Response(content=html_str, media_type="text/html")
 
     @app.post("/partials/dashboard/tenants/delete")
     async def partial_tenants_delete(request: Request, tenant_id: str) -> Response:
@@ -714,13 +716,12 @@ def create_admin_app(*, home: Path | None = None) -> FastAPI:  # noqa: C901
         _delete_tenant(target_home, tenant_id)
 
         tenants = _load_tenants(target_home)
-        return _template_response(
-            request=request,
-            home=target_home,
-            templates=templates,
-            template_name="partials/panels/tenants_list.html",
-            context={"tenants": tenants},
-        )
+        from htmy import Renderer
+
+        from astraauth_admin_ui.components import TenantsList
+
+        html_str = await Renderer().render(TenantsList(tenants))
+        return Response(content=html_str, media_type="text/html")
 
     @app.post("/partials/actions/config-init")
     async def partial_config_init(request: Request) -> Response:

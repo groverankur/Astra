@@ -122,16 +122,14 @@ Current protections:
 - setup tokens are short-lived and hashed at rest
 - setup token issuance can be locked permanently with `astra bootstrap-lockdown`
 
-## OIDC Provider Configuration
+## Active Extensions Configuration
 
-OIDC providers are configured through the `idp` section of `AuthConfig` and consumed by `astraauth-service`. OIDC is the only enterprise federation protocol implemented in the current baseline.
+- **Astra Niyam (`astraauth-policy`)**: Zanzibar-style relationship-based access control (ReBAC) policies are parsed from standard DSL schemas and solved dynamically using relation tuple stores.
+- **Astra Mandal (`astraauth-tenancy`)**: Workspace limits, per-tenant relational database routing, and context bindings are managed via the tenancy middleware.
 
 ## Deferred Configuration Areas
 
 These do not exist yet as first-class packages or schemas:
 
-- policy authoring package
-- tenancy package
-- observability package
-- SAML provider config
-- LDAP/AD bridge config
+- **Astra Drishti (`astraauth-observability`)**: Dedicated metrics collector and visualization dashboard (currently using standard logging/metrics).
+- **Enterprise Federation Bridges**: SAML identity providers and LDAP/AD synchronization bridges.

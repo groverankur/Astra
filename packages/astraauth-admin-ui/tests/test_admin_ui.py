@@ -250,7 +250,7 @@ def test_admin_ui_htmx_partials_update_dashboard_in_place(workspace_tmp_path: Pa
         },
     )
     assert partial_login.status_code == 200
-    assert "Deployment Overview" in partial_login.text
+    assert "Runtime Overview" in partial_login.text
     assert "hx-swap-oob" in partial_login.text
 
     partial_sidebar = client.get("/partials/sidebar")

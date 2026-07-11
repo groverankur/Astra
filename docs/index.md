@@ -13,20 +13,18 @@ Astra is the public platform name for the current `astraauth-*` package family.
 - driver-first relational persistence for SQLite, PostgreSQL, and MySQL
 - operator tooling through CLI and optional Textual TUI
 
-## Branding Map
-
-| Public Name | Technical Package / Namespace |
-| --- | --- |
-| Astra Yantra | `astraauth (astraauth.core)` |
-| Astra Sutra | `astraauth (astraauth.service)` |
-| Astra Setu | `astraauth (astraauth.adapters)` |
-| Astra Tantra | `astraauth-plugins` / `astraauth.plugins` |
-| Astra Pramaan | `astraauth (astraauth.idp)` |
-| Astra Mudra | `astraauth (astraauth.webauthn)` |
-| Astra Niyam | `astraauth-policy` |
-| Astra Mandal | `astraauth-tenancy` |
-| Astra Dwaar | `astraauth-cli` |
-| Astra Netra | `astraauth-admin-ui` |
+| Public Name | Technical Package / Namespace | Description |
+| --- | --- | --- |
+| `Astra Yantra` | `astraauth` (`astraauth.core`) | Core platform domain models, persistence drivers, and auth protocols |
+| `Astra Sutra` | `astraauth` (`astraauth.service`) | Runtime service execution engine, session validators, and setup helpers |
+| `Astra Setu` | `astraauth` (`astraauth.adapters`) | Web framework adapters and HTTP middleware layers |
+| `Astra Tantra` | `astraauth-plugins` (`astraauth_plugins` / `astraauth.plugins`) | Plugin hub and hook extension registry |
+| `Astra Pramaan` | `astraauth` (`astraauth.idp`) | OIDC federation providers and discovery routing |
+| `Astra Mudra` | `astraauth` (`astraauth.webauthn`) | WebAuthn verification contracts and authentication |
+| `Astra Niyam` | `astraauth-policy` (`astraauth_policy`) | Zanzibar-style ReBAC schema parsing and permission solving |
+| `Astra Mandal` | `astraauth-tenancy` (`astraauth_tenancy`) | Multi-tenancy isolation and dynamic routing |
+| `Astra Dwaar` | `astraauth-cli` (`astraauth_cli`) | Operator CLI tool and Textual TUI panel |
+| `Astra Netra` | `astraauth-admin-ui` (`astraauth_admin_ui`) | Operator Web Admin Console dashboard |
 
 Core platform submodules are importable via `astraauth.<submodule>` (e.g. `astraauth.core`).
 
@@ -40,6 +38,7 @@ Core platform submodules are importable via `astraauth.<submodule>` (e.g. `astra
 
 ## Start Here
 
+* **Medium Article**: [Introducing Astra: The Unified Authentication and Authorization Platform for Python](https://medium.com/@astraauth/introducing-astra-the-unified-authentication-authorization-platform-for-python-d86cf5c531d0)
 1. [Installation](getting-started/installation.md)
 2. [Quick Start](getting-started/quick-start.md)
 3. [Configuration](getting-started/configuration.md)

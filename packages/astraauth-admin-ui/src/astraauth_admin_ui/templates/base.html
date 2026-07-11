@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>{{ page_title }}</title>
     <link rel="stylesheet" href="{{ url_for('static', path='vendor/basecoat/basecoat.min.css') }}" />
-    <link rel="stylesheet" href="{{ url_for('static', path='admin.css') }}" />
+    <link rel="stylesheet" href="{{ url_for('static', path='admin.css') }}?v=1.1.0" />
     {% block head %}{% endblock %}
   </head>
   <body>
@@ -16,7 +16,7 @@
     {% block body %}{% endblock %}
     <script src="{{ url_for('static', path='vendor/htmx/htmx.min.js') }}" defer></script>
     <script src="{{ url_for('static', path='vendor/basecoat/js/all.min.js') }}" defer></script>
-    <script src="{{ url_for('static', path='admin.js') }}" defer></script>
+    <script src="{{ url_for('static', path='admin.js') }}?v=1.1.0" defer></script>
     {% block scripts %}{% endblock %}
   </body>
 </html>

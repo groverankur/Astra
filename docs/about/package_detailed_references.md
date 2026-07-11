@@ -4,14 +4,14 @@ This document breaks down the System Context, Module Architecture, and sequentia
 
 ---
 
-## 1. Astra Yantra Core (`astraauth.core`)
+## 1. Astra Yantra (Core Module / `astraauth.core`)
 
 The absolute foundation containing framework-agnostic domain models, settings validation, and cryptographic/policy primitives.
 
 ### System Context
 ```mermaid
 graph LR
-    Core["astraauth.core (Yantra)"]
+    Core["astraauth-core / astraauth.core"]
     DB[("Relational Database")]
     Crypt["cryptography / joserfc / pwdlib"]
     Policies["Policy Configs (RBAC + ABAC)"]
@@ -53,14 +53,14 @@ sequenceDiagram
 
 ---
 
-## 2. Astra Sutra Service (`astraauth.service`)
+## 2. Astra Sutra (Service Module / `astraauth.service`)
 
 The runtime composition layer that bootstraps application setups, connection pools, structured logging, and observability.
 
 ### System Context
 ```mermaid
 graph TD
-    Service["astraauth.service (Sutra)"]
+    Service["astraauth-service / astraauth.service"]
     Config["Runtime Settings File"]
     Logger["Structured Logging (Redacted)"]
     Pools["DB Connection Pools"]
@@ -82,8 +82,8 @@ graph TD
 ```mermaid
 sequenceDiagram
     participant Operator as Admin UI / CLI
-    participant Service as astraauth.service (Sutra)
-    participant Core as astraauth.core (Yantra)
+    participant Service as astraauth.service
+    participant Core as astraauth.core
     participant Pools as Database Connection Pools
 
     Operator->>Service: Trigger Settings Reload (e.g. key rotation or DB shift)
@@ -102,7 +102,7 @@ sequenceDiagram
 
 ---
 
-## 3. Astra Setu Adapters (`astraauth.adapters`)
+## 3. Astra Setu (Adapters Module / `astraauth.adapters`)
 
 Framework wrappers providing pre-built route handlers, session managers, and middleware hooks for major Python runtimes.
 
@@ -110,8 +110,8 @@ Framework wrappers providing pre-built route handlers, session managers, and mid
 ```mermaid
 graph LR
     WebFrameworks["FastAPI / Flask / Django / Robyn / Litestar"]
-    Adapter["astraauth.adapters (Setu)"]
-    Core["astraauth.core (Yantra)"]
+    Adapter["astraauth-adapters / astraauth.adapters"]
+    Core["astraauth-core / astraauth.core"]
 
     WebFrameworks --> Adapter
     Adapter --> Core
@@ -128,8 +128,8 @@ graph LR
 sequenceDiagram
     actor Client as External Client
     participant API as FastAPI Application Route
-    participant Adapter as fastapi_adapter (Setu)
-    participant Core as astraauth.core (Yantra)
+    participant Adapter as fastapi_adapter
+    participant Core as astraauth.core
 
     Client->>API: GET /protected-resource (Cookie / Authorization Header)
     API->>Adapter: Check Dependency (e.g. Depends(require_user(scope="admin")))
@@ -148,14 +148,14 @@ sequenceDiagram
 
 ---
 
-## 4. Astra Tantra Plugins Engine (`astraauth.plugins`)
+## 4. Plugins Engine (`astraauth.plugins`)
 
 The execution coordinator that loads, registers, and sandboxes tenant-specific custom hooks (middleware) with timeout bounds.
 
 ### System Context
 ```mermaid
 graph TD
-    Plugins["astraauth.plugins (Tantra Engine)"]
+    Plugins["astraauth.plugins (Engine)"]
     Registry["Relational Plugin Registry"]
     Sandbox["Async Timeout Task Sandbox"]
     Events["Event Bus Auditing"]
@@ -199,16 +199,16 @@ sequenceDiagram
 
 ---
 
-## 5. Astra Pramaan IdP (`astraauth.idp`)
+## 5. Astra Pramaan (Identity Provider / `astraauth.idp`)
 
 Coordinates identity linking, user mapping, and token validation for federated identity setups (OIDC).
 
 ### System Context
 ```mermaid
 graph LR
-    IdP["astraauth.idp (Pramaan)"]
+    IdP["astraauth-idp / astraauth.idp"]
     ExtOIDC["Upstream OIDC Providers (Okta/Google)"]
-    Core["astraauth.core (Yantra)"]
+    Core["astraauth-core / astraauth.core"]
     Audit["Federation Audit Logger"]
 
     IdP --> ExtOIDC
@@ -226,10 +226,10 @@ graph LR
 ```mermaid
 sequenceDiagram
     actor User as User Agent
-    participant Adapter as Adapters (Setu)
-    participant Pramaan as astraauth.idp (Pramaan)
+    participant Adapter as Adapters
+    participant IDP as astraauth.idp
     participant Okta as Upstream Okta OIDC
-    participant Core as astraauth.core (Yantra)
+    participant Core as astraauth.core
 
     User->>Adapter: GET /auth/federation/callback?code=xxx&state=yyy
     Adapter->>Pramaan: Handle Callback
@@ -254,16 +254,16 @@ sequenceDiagram
 
 ---
 
-## 6. Astra Mudra WebAuthn (`astraauth.webauthn`)
+## 6. Astra Mudra (WebAuthn Module / `astraauth.webauthn`)
 
 Houses FIDO2 ceremony controllers, handles registration/authentication challenges, and verifies cryptographic public keys.
 
 ### System Context
 ```mermaid
 graph LR
-    Mudra["astraauth.webauthn (Mudra)"]
+    Mudra["astraauth-webauthn / astraauth.webauthn"]
     FIDO2["fido2 Library"]
-    Core["astraauth.core (Yantra)"]
+    Core["astraauth-core / astraauth.core"]
     WebAuthnStore["SQL Key Credentials Store"]
 
     Mudra --> FIDO2
@@ -280,10 +280,10 @@ graph LR
 ```mermaid
 sequenceDiagram
     actor User as User Agent
-    participant Adapter as Adapters (Setu)
-    participant Mudra as astraauth.webauthn (Mudra)
+    participant Adapter as Adapters
+    participant WebAuthn as astraauth.webauthn
     participant DB as SQL Credential Store
-    participant Core as astraauth.core (Yantra)
+    participant Core as astraauth.core
 
     User->>Adapter: Request Login Options (Username)
     Adapter->>Mudra: Build Assertion Options
@@ -310,15 +310,15 @@ sequenceDiagram
 
 ---
 
-## 7. Astra Tantra Hub (`astraauth-plugins`)
+## 7. Astra Tantra (Plugins Hub / `astraauth-plugins`)
 
 The separate workspace package housing standard builtin plugins and serving as the hub/registry for community extensions.
 
 ### System Context
 ```mermaid
 graph LR
-    Hub["astraauth-plugins (Tantra Hub)"]
-    CorePlugins["astraauth.plugins (Core Engine)"]
+    Hub["astraauth-plugins (Hub)"]
+    CorePlugins["astraauth.plugins (Engine)"]
     Builtins["Builtin Plugins (Geo/Risk)"]
 
     Hub --> CorePlugins
@@ -332,51 +332,52 @@ graph LR
 
 ---
 
-## 8. Astra Dwaar CLI (`astraauth-cli`)
+## 8. Astra Dwaar (Operator CLI / `astraauth-cli`)
 
 The operator interface providing text prompt wizards, textual TUIs, database setup checks, and key backup controllers.
 
 ### System Context
 ```mermaid
 graph TD
-    CLI["astraauth-cli (Dwaar)"]
-    Sutra["astraauth.service (Sutra)"]
+    CLI["astraauth-cli"]
+    Service["astraauth.service"]
     Console["Operator Terminal console"]
     Backup["Encrypted State Files"]
 
-    CLI --> Sutra
+    CLI --> Service
     CLI --> Console
     CLI --> Backup
 ```
 
 ---
 
-## 9. Astra Netra Admin UI (`astraauth-admin-ui`)
+## 9. Astra Netra (Admin UI Console / `astraauth-admin-ui`)
 
 A FastAPI-powered web-dashboard utilizing HTMX to allow real-time configurations, audits, and key updates without client JavaScript bundles.
 
 ### System Context
 ```mermaid
 graph TD
-    AdminUI["astraauth-admin-ui (Netra)"]
-    Sutra["astraauth.service (Sutra)"]
+    AdminUI["astraauth-admin-ui"]
+    Service["astraauth.service"]
     HTMX["HTMX AJAX Web Clients"]
-    Templates["Jinja2 Templates & Static Assets"]
+    Templates["HTMY Templates & Static Assets"]
 
-    AdminUI --> Sutra
+    AdminUI --> Service
     AdminUI --> HTMX
     AdminUI --> Templates
+```
 
 ---
 
-## 10. Astra Niyam ReBAC (`astraauth-policy`)
+## 10. Astra Niyam (ReBAC Policy Engine / `astraauth-policy`)
 
 A Zanzibar-inspired relationship-based access control engine providing schema parsing and check evaluation.
 
 ### System Context
 ```mermaid
 graph TD
-    Policy["astraauth-policy (Niyam)"]
+    Policy["astraauth-policy"]
     Store["RelationTupleStore (In-memory/Relational)"]
     Parser["SchemaParser (DSL compiler)"]
     Engine["CheckEngine (Transitive solver)"]
@@ -393,14 +394,14 @@ graph TD
 
 ---
 
-## 11. Astra Mandal Tenancy (`astraauth-tenancy`)
+## 11. Astra Mandal (Multi-Tenancy / `astraauth-tenancy`)
 
 Provides request context tenant context bindings and ASGI/Flask routing middleware.
 
 ### System Context
 ```mermaid
 graph TD
-    Tenancy["astraauth-tenancy (Mandal)"]
+    Tenancy["astraauth-tenancy"]
     Context["ContextVar variables"]
     ASGI["ASGITenancyMiddleware"]
     Flask["Flask context hooks"]

@@ -27,12 +27,11 @@ Each supported adapter has a smoke-testable example:
 
 | Adapter | Example | Notes |
 | --- | --- | --- |
-| Generic ASGI | `examples/05_asgi_app.py` | constructs an ASGI app with `AdapterOriginPolicy` |
-| FastAPI | `examples/11_fastapi_e2e_app.py` | integrated reference app; `build_app()` returns the app |
-| Flask | `examples/06_flask_app.py` | minimal `build_app()` example |
-| Flask deployment | `examples/08_flask_deployment.py` | deployment-shaped `build_app()` example |
-| Django | `examples/09_django_deployment.py` | `build_urlpatterns()` for URLConf inclusion |
-| Litestar | `examples/12_litestar_app.py` | `build_app()`; server start is opt-in with `ASTRAAUTH_EXAMPLE_SERVE=1` |
-| Robyn | `examples/13_robyn_app.py` | `build_app()`; server start is opt-in with `ASTRAAUTH_EXAMPLE_SERVE=1` |
+| **Astra Demo** | `examples/astra_demo.py` | Unified Security Dashboard Demo showing ReBAC, session audits, and MFA. |
+| **FastAPI** | `examples/fastapi_app.py` | Polished FastAPI E2E application; `build_app()` returns the app. |
+| **Django** | `examples/django_app.py` | Django adapter using `build_urlpatterns()` for URLConf inclusion. |
+| **Flask** | `examples/flask_app.py` | Minimal and production-shaped Flask configuration mount. |
+| **Litestar** | `examples/litestar_app.py` | `build_app()`; server start is opt-in with `ASTRAAUTH_EXAMPLE_SERVE=1`. |
+| **Robyn** | `examples/robyn_app.py` | `build_app()`; server start is opt-in with `ASTRAAUTH_EXAMPLE_SERVE=1`. |
 
 Examples are designed to import and construct without binding ports during tests. Optional framework examples print installation guidance and exit cleanly when the extra is not installed.

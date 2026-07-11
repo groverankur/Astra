@@ -4,24 +4,14 @@ The repo examples are local demos and deployment-shaped references. They are des
 
 See the full index in the repo root at `examples/README.md`.
 
-## Supported Adapter Coverage
-
 | Adapter | Example | Behavior |
 | --- | --- | --- |
-| Generic ASGI | `examples/05_asgi_app.py` | constructs an ASGI app with local origin policy |
-| Flask | `examples/06_flask_app.py` | exposes `build_app()` for a minimal Flask mount |
-| Flask deployment | `examples/08_flask_deployment.py` | exposes `build_app()` and creates a local runtime home when run |
-| Django | `examples/09_django_deployment.py` | exposes `build_urlpatterns()` for project URLConf inclusion |
-| FastAPI | `examples/11_fastapi_e2e_app.py` | exposes `build_app()` for an integrated OAuth/MFA/OIDC/WebAuthn/plugin demo |
-| Litestar | `examples/12_litestar_app.py` | exposes `build_app()` and only serves when `ASTRAAUTH_EXAMPLE_SERVE=1` |
-| Robyn | `examples/13_robyn_app.py` | exposes `build_app()` and only serves when `ASTRAAUTH_EXAMPLE_SERVE=1` |
+| **Astra Demo** | `examples/astra_demo.py` | Unified Security Dashboard Demo SPA showing Zanzibar ReBAC, audits, and MFA. |
+| **FastAPI** | `examples/fastapi_app.py` | Exposes end-to-end FastAPI setup with OAuth/MFA/OIDC/WebAuthn/plugin demo. |
+| **Django** | `examples/django_app.py` | Exposes `build_urlpatterns()` and views for project URLConf inclusion. |
+| **Flask** | `examples/flask_app.py` | Minimal and production-shaped Flask configuration mount. |
+| **Litestar** | `examples/litestar_app.py` | End-to-end Litestar mount with cookie session state management. |
+| **Robyn** | `examples/robyn_app.py` | Robyn (Rust-based web server) app showing session checking and step-up MFA. |
 
-All adapter examples show or use `AdapterOriginPolicy` so browser-facing state-changing requests are not implicitly trusted across origins. Framework examples construct without binding ports by default; serving is opt-in where supported.
-
-## Release-Critical Safety Examples
-
-- Encrypted bootstrap export: `examples/14_encrypted_bootstrap_export.py`
-- Plugin trust policy: `examples/15_plugin_trust_policy.py`
-- WebAuthn production verifier wiring: `examples/16_webauthn_production_verifier.py`
-
+All adapter examples show or use `AdapterOriginPolicy` so browser-facing state-changing requests are not implicitly trusted across origins.
 Demo credentials and secrets in examples are local-only placeholders. Replace them before using the pattern outside a disposable local runtime.

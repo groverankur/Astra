@@ -11,20 +11,22 @@ The System Context diagram illustrates the system boundaries of the AstraAuth pl
 ```mermaid
 graph TB
     subgraph Clients["External Client Applications & Services"]
-        fastapi["FastAPI App (Setu Adapter)"]
-        flask["Flask App (Setu Adapter)"]
-        django["Django App (Setu Adapter)"]
-        cli["Astra CLI / Textual TUI (Dwaar)"]
+        fastapi["FastAPI App (Astra Setu)"]
+        flask["Flask App (Astra Setu)"]
+        django["Django App (Astra Setu)"]
+        cli["Astra CLI / TUI (Astra Dwaar)"]
     end
 
     subgraph Platform["AstraAuth Platform Boundary"]
-        adapters["astraauth.adapters (Setu)"]
-        admin_ui["astraauth-admin-ui (Netra)"]
-        core_service["astraauth.service (Sutra)"]
-        core_domain["astraauth.core (Yantra)"]
-        plugins["astraauth.plugins (Tantra Engine)"]
-        idp["astraauth.idp (Pramaan)"]
-        webauthn["astraauth.webauthn (Mudra)"]
+        adapters["astraauth.adapters (Astra Setu)"]
+        admin_ui["astraauth-admin-ui (Astra Netra)"]
+        core_service["astraauth.service (Astra Sutra)"]
+        core_domain["astraauth.core (Astra Yantra)"]
+        plugins["astraauth.plugins (Engine)"]
+        idp["astraauth.idp (Astra Pramaan)"]
+        webauthn["astraauth.webauthn (Astra Mudra)"]
+        policy["astraauth-policy (Astra Niyam)"]
+        tenancy["astraauth-tenancy (Astra Mandal)"]
     end
 
     subgraph RelationalDB["Relational Databases"]
@@ -56,6 +58,10 @@ graph TB
     core_service --> idp
     core_service --> webauthn
     core_service --> plugins
+    
+    %% Policy & Tenancy Routing
+    adapters --> tenancy
+    core_domain --> policy
 
     %% Data Store Relationships
     core_domain --> sqlite
@@ -81,27 +87,30 @@ AstraAuth is designed around a layered structure with strict dependency flows. D
 graph TD
     %% Define Layers
     subgraph presentation["Presentation & Interface Layer"]
-        cli_pkg["astraauth-cli (Dwaar)"]
-        ui_pkg["astraauth-admin-ui (Netra)"]
+        cli_pkg["astraauth-cli (Astra Dwaar)"]
+        ui_pkg["astraauth-admin-ui (Astra Netra)"]
     end
 
     subgraph core["Consolidated Core Package (astraauth)"]
-        adapters_pkg["astraauth.adapters (Setu)"]
-        service_pkg["astraauth.service (Sutra)"]
-        idp_pkg["astraauth.idp (Pramaan)"]
-        webauthn_pkg["astraauth.webauthn (Mudra)"]
-        plugins_pkg["astraauth.plugins (Tantra Engine)"]
-        core_pkg["astraauth.core (Yantra)"]
+        adapters_pkg["astraauth.adapters (Astra Setu)"]
+        service_pkg["astraauth.service (Astra Sutra)"]
+        idp_pkg["astraauth.idp (Astra Pramaan)"]
+        webauthn_pkg["astraauth.webauthn (Astra Mudra)"]
+        plugins_pkg["astraauth.plugins (Engine)"]
+        core_pkg["astraauth.core (Astra Yantra)"]
     end
 
-    subgraph hub["External Plugins Hub"]
-        hub_pkg["astraauth-plugins (Tantra Hub)"]
+    subgraph extensions["Active Extension Engines"]
+        policy_pkg["astraauth-policy (Astra Niyam)"]
+        tenancy_pkg["astraauth-tenancy (Astra Mandal)"]
+        hub_pkg["astraauth-plugins (Astra Tantra Hub)"]
     end
 
     %% Dependencies
     cli_pkg --> service_pkg
     ui_pkg --> service_pkg
     
+    adapters_pkg --> tenancy_pkg
     adapters_pkg --> core_pkg
     adapters_pkg --> plugins_pkg
 
@@ -115,13 +124,18 @@ graph TD
     plugins_pkg --> core_pkg
 
     hub_pkg --> plugins_pkg
+    policy_pkg --> core_pkg
+    tenancy_pkg --> core_pkg
 ```
 
 ### Module Descriptions
-1.  **Astra Yantra (`astraauth.core`)**: The absolute foundation. Contains domain database models, configuration schemas, cryptography hashing defaults (Argon2id), session tokens/JWKS signatures, constant-time API validations, and hybrid RBAC+ABAC engine logic.
-2.  **Astra Sutra (`astraauth.service`)**: Integrates and boots the database pool, configured logger redaction, event queues, and telemetry correlation ID hooks.
-3.  **Astra Setu (`astraauth.adapters`)**: Adapts generalized platform session/token controls into FastAPI dependencies, Django middleware, Flask hooks, and Starlette ASGI frameworks.
-4.  **Astra Mudra / Pramaan / Tantra**: Specialized features mapping to WebAuthn ceremonies, Federated OIDC endpoints, and plugin hook sandboxes respectively.
+
+1.  **`Astra Yantra` (`astraauth.core`)**: The absolute foundation. Contains domain database models, configuration schemas, cryptography hashing defaults (Argon2id), session tokens/JWKS signatures, constant-time API validations, and hybrid RBAC+ABAC engine logic.
+2.  **`Astra Sutra` (`astraauth.service`)**: Integrates and boots the database pool, configured logger redaction, event queues, and telemetry correlation ID hooks.
+3.  **`Astra Setu` (`astraauth.adapters`)**: Adapts generalized platform session/token controls into FastAPI dependencies, Django middleware, Flask hooks, and Starlette ASGI frameworks.
+4.  **`Astra Pramaan` (`astraauth.idp`) / `Astra Mudra` (`astraauth.webauthn`) / Plugins Engine**: Specialized features mapping to Federated OIDC endpoints, WebAuthn ceremonies, and plugin hook sandboxes respectively.
+5.  **`Astra Niyam` (`astraauth-policy`) / `Astra Mandal` (`astraauth-tenancy`)**: Zanzibar-style transitive relationship permission check engine and dynamic tenant workspace routing context managers.
+
 
 ---
 
@@ -168,28 +182,28 @@ The workflow details an interactive flow where a client requests a resource, pro
 sequenceDiagram
     autonumber
     actor User as User Agent (Browser/Client)
-    participant Setu as Setu Adapter (astraauth.adapters)
-    participant Sutra as Sutra Service (astraauth.service)
-    participant Yantra as Yantra Core (astraauth.core)
-    participant Mudra as Mudra (astraauth.webauthn) / TOTP
+    participant Setu as Adapters (astraauth.adapters)
+    participant Service as Service (astraauth.service)
+    participant Core as Core (astraauth.core)
+    participant Mudra as WebAuthn (astraauth.webauthn) / TOTP
 
     User->>Setu: Request Token / Authenticate (User + Pass)
-    Setu->>Sutra: Authenticate Request
-    Sutra->>Yantra: Verify Credentials (Argon2id Check)
-    Yantra-->>Sutra: Credentials Valid
-    Sutra->>Yantra: Evaluate Policy Engine (RBAC + ABAC)
+    Setu->>Service: Authenticate Request
+    Service->>Core: Verify Credentials (Argon2id Check)
+    Core-->>Service: Credentials Valid
+    Service->>Core: Evaluate Policy Engine (RBAC + ABAC)
     
     alt MFA Required
-        Yantra-->>Sutra: Returns STEP_UP / MFA Challenge Needed
-        Sutra->>Mudra: Initiate Challenge Session
+        Core-->>Service: Returns STEP_UP / MFA Challenge Needed
+        Service->>Mudra: Initiate Challenge Session
         Mudra-->>User: Dispatch Challenge (WebAuthn/TOTP challenge)
         User->>Mudra: Submit Challenge Proof
-        Mudra->>Yantra: Verify Proof
-        Yantra-->>Sutra: Proof Validated
+        Mudra->>Core: Verify Proof
+        Core-->>Service: Proof Validated
     end
 
-    Sutra->>Yantra: Mint Access & Refresh Tokens (JWKS Sig)
-    Yantra-->>Setu: Return Token Payload
+    Service->>Core: Mint Access & Refresh Tokens (JWKS Sig)
+    Core-->>Setu: Return Token Payload
     Setu-->>User: Return HTTP 200 (Access Token + Session Cookie)
 ```
 
@@ -222,7 +236,7 @@ sequenceDiagram
             Tantra-->>Adapter: Continue flow (Log & bypass error)
         end
     end
-
+```
 ---
 
 ## 5. ReBAC Permission Evaluation Workflow
@@ -233,7 +247,7 @@ This diagram outlines how `CheckEngine` evaluates permissions transitively by wa
 sequenceDiagram
     autonumber
     participant App as Client Application
-    participant Engine as CheckEngine (astraauth.policy)
+    participant Engine as CheckEngine (astraauth_policy)
     participant Store as RelationTupleStore
     participant Parser as SchemaParser
 
@@ -262,7 +276,7 @@ Shows the header-intercept lifecycle in `ASGITenancyMiddleware` to set dynamic c
 sequenceDiagram
     autonumber
     participant Request as Incoming HTTP Request
-    participant MW as ASGITenancyMiddleware (astraauth.tenancy)
+    participant MW as ASGITenancyMiddleware (astraauth_tenancy)
     participant ContextVar as tenant_id ContextVar
     participant Router as App Router/Endpoints
 

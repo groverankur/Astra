@@ -1,107 +1,33 @@
 {% from "macros/ui.html" import field, nav_button, panel, select_field, submit_button %}
 <section class="workspace-stack">
-  <header class="workspace-header">
-    <div>
-      <p class="eyebrow">Operator Dashboard</p>
-      <h2>Deployment Overview</h2>
-      <p class="workspace-copy">Identity operations, federation review, runtime controls, and audit evidence for this deployment.</p>
+  
+  <!-- Sleek Auth0-style Top Utility Bar -->
+  <div class="workspace-top-bar">
+    <div class="breadcrumbs">
+      <span class="breadcrumb-item">Astra Netra</span>
+      <span class="breadcrumb-separator">/</span>
+      <span class="breadcrumb-item active">Console</span>
     </div>
-    <section class="workspace-switcher" aria-label="Tenant and operator context">
-      <div class="workspace-switcher__tile">
-        <div class="label">Tenant</div>
-        <div class="workspace-switcher__value">{{ principal.tenant_id }}</div>
-        <div class="workspace-switcher__meta">Active identity realm</div>
+    <div class="operator-meta">
+      <span class="operator-avatar-icon">👤</span>
+      <span class="operator-name">{{ principal.username }}</span>
+      <div class="operator-roles-container">
+        {% for role in principal.roles %}
+        <span class="role-chip">{{ role }}</span>
+        {% endfor %}
       </div>
-      <div class="workspace-switcher__tile">
-        <div class="label">Operator</div>
-        <div class="workspace-switcher__value">{{ principal.username }}</div>
-        <div class="workspace-switcher__chips">
-          {% for role in principal.roles %}
-          <span class="role-chip">{{ role }}</span>
-          {% endfor %}
-        </div>
-      </div>
-    </section>
-  </header>
+    </div>
+  </div>
 
   <section id="summary-region">
     {% include "partials/panels/summary_cards.html" %}
   </section>
 
-  <section class="dashboard-content-grid">
-    <div class="workspace-stack">
-      <nav class="workspace-tabs" aria-label="Workspace sections">
-        {{ nav_button("Overview", "/partials/dashboard/runtime", "#workspace-tab-panel", "tab", "◈", "Core") }}
-        {{ nav_button("Infrastructure", "/partials/dashboard/infrastructure", "#workspace-tab-panel", "tab", "⛭", "Ops") }}
-        {{ nav_button("OIDC Audit", "/partials/dashboard/oidc-audit?tenant_id=" ~ principal.tenant_id, "#workspace-tab-panel", "tab", "◎", "OIDC") }}
-        {{ nav_button("Admin Audit", "/partials/dashboard/admin-audit?tenant_id=" ~ principal.tenant_id, "#workspace-tab-panel", "tab", "▣", "IAM") }}
-      </nav>
-
-      <div id="workspace-tab-panel" class="workspace-focus-panel">
-        {% include "partials/panels/runtime_overview.html" %}
-      </div>
+  <!-- Full-Width Workspace Canvas Panel -->
+  <div class="dashboard-content-canvas">
+    <div id="workspace-tab-panel" class="workspace-focus-panel-full">
+      {% include "partials/panels/runtime_overview.html" %}
     </div>
+  </div>
 
-    <aside class="workspace-rail">
-      <section class="rail-intro">
-        <p class="eyebrow">Action Rail</p>
-        <h3>Operator Changes</h3>
-        <p class="workspace-copy">Open only the control you need. The dashboard panels refresh in place after each action, so you can keep context without scanning a full form wall.</p>
-      </section>
-
-      <details class="detail-panel rail-detail" open>
-        <summary>Runtime Config</summary>
-        <p class="workspace-copy rail-detail-copy">Update issuer, environment, and persistence metadata for this runtime home.</p>
-        <form class="form-stack"
-              data-workspace-view="/partials/dashboard/runtime"
-              hx-post="/partials/actions/config-init"
-              hx-target="#workspace-tab-panel"
-              hx-swap="innerHTML">
-          <input type="hidden" name="csrf_token" value="{{ csrf_token }}" />
-          {{ field("project_name", "Project name", config.project_name or "Astra", "Project name") }}
-          {{ select_field("environment", "Environment", ["dev", "test", "prod"], inventory.environment or "dev") }}
-          {{ select_field("persistence_backend", "Persistence backend", ["sqlite", "postgres", "mysql"], persistence.stores[0].backend if persistence.stores else "sqlite") }}
-          {{ field("issuer", "Issuer", inventory.issuer or "https://auth.local", "Issuer") }}
-          <input type="hidden" name="encrypt_values" value="true" />
-          {{ submit_button("Save Config", "primary") }}
-        </form>
-      </details>
-
-      <details class="detail-panel rail-detail">
-        <summary>Bootstrap Admin</summary>
-        <p class="workspace-copy rail-detail-copy">Rotate or replace the bootstrap operator identity used for first-run and emergency access.</p>
-        <form class="form-stack"
-              data-workspace-view="/partials/dashboard/admin-audit"
-              hx-post="/partials/actions/init-admin"
-              hx-target="#workspace-tab-panel"
-              hx-swap="innerHTML">
-          <input type="hidden" name="csrf_token" value="{{ csrf_token }}" />
-          {{ field("tenant_id", "Tenant ID", default_tenant_id, "Tenant ID") }}
-          {{ field("username", "Admin username", principal.username, "Admin username") }}
-          {{ field("password", "Admin password", "", "New password", type="password") }}
-          {{ field("email", "Admin email", bootstrap.admins[0].email if bootstrap.admins else "", "Admin email") }}
-          <input type="hidden" name="role_name" value="admin" />
-          <input type="hidden" name="client_id" value="bootstrap-admin-client" />
-          {{ submit_button("Save Bootstrap Admin", "success") }}
-        </form>
-      </details>
-
-      <details class="detail-panel rail-detail">
-        <summary>Key Management</summary>
-        <p class="workspace-copy rail-detail-copy">Rotate signing keys for verifier changes and encryption keys for protected-state replacement.</p>
-        <div class="button-grid">
-          <form data-workspace-view="/partials/dashboard/infrastructure" hx-post="/partials/actions/key-rotate" hx-target="#workspace-tab-panel" hx-swap="innerHTML">
-            <input type="hidden" name="csrf_token" value="{{ csrf_token }}" />
-            <input type="hidden" name="use" value="sig" />
-            {{ submit_button("Rotate Signing Keys", "magenta") }}
-          </form>
-          <form data-workspace-view="/partials/dashboard/infrastructure" hx-post="/partials/actions/key-rotate" hx-target="#workspace-tab-panel" hx-swap="innerHTML">
-            <input type="hidden" name="csrf_token" value="{{ csrf_token }}" />
-            <input type="hidden" name="use" value="enc" />
-            {{ submit_button("Rotate Encryption Keys", "danger") }}
-          </form>
-        </div>
-      </details>
-    </aside>
-  </section>
 </section>

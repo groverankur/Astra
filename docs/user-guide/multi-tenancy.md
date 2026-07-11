@@ -57,11 +57,22 @@ app = Flask(__name__)
 mount_flask_tenancy_routing(app, header_name="X-Tenant-ID")
 ```
 
-## Graphical Tenancy Console
+## 🖥️ Graphical Tenancy Console (Astra Netra)
 
-Astra Netra (**Astra browser admin UI**) provides a built-in Tenants Management Console:
-- **Visual Listing**: Displays active tenant workspaces, their isolation limits, and database connections.
-- **Register New Tenants**: An interactive form to define tenant metadata, database connection strings, maximum user counts, and maximum relation tuple limits.
-- **Dynamic Operations**: Add and delete tenant workspaces on-the-fly.
+Astra Netra provides a full-featured browser-based console to orchestrate tenant lifecycle states without raw database queries:
 
-Access it by running `uv run astra admin-ui` and navigating to the **Tenants** tab in the sidebar.
+### Key Capabilities
+*   **Visual Listings**: Inspect active tenant workspaces, their usage, operational thresholds, and active relational backends in one view.
+*   **On-the-Fly Registration**: Register new tenants with customized limits (`max_users`, `max_relation_tuples`) and specific connection strings.
+*   **Dynamic Offboarding**: Instantly delete tenant workspaces and context pools.
+
+### Running the Console
+To boot the browser-based dashboard, use the CLI utility:
+```bash
+uv run astra admin-ui --home .astraauth --port 8000
+```
+Or run the package entrypoint directly:
+```bash
+python -m astraauth_admin_ui --home .astraauth --port 8000
+```
+Then navigate to the **Tenants** workspace tab in the left navigation sidebar.

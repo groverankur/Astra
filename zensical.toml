@@ -7,6 +7,7 @@ repo_name = "groverankur/Astra"
 repo_url = "https://github.com/groverankur/Astra"
 edit_uri = "edit/main/docs/"
 copyright = "Copyright © 2026 Ankur Grover"
+extra_css = ["stylesheets/extra.css"]
 nav = [
   {"Home" = "index.md"},
   {"Getting Started" = [
@@ -88,16 +89,16 @@ toggle.name = "Switch to light mode"
 [[project.theme.palette]]
 media = "(prefers-color-scheme: light)"
 scheme = "default"
-primary = "blue"
-accent = "blue"
+primary = "custom"
+accent = "custom"
 toggle.icon = "lucide/sun"
 toggle.name = "Switch to dark mode"
 
 [[project.theme.palette]]
 media = "(prefers-color-scheme: dark)"
 scheme = "slate"
-primary = "blue"
-accent = "blue"
+primary = "custom"
+accent = "custom"
 toggle.icon = "lucide/moon"
 toggle.name = "Switch to system preference"
 

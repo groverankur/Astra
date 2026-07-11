@@ -4,55 +4,64 @@
   <div class="sidebar-brand">
     <p class="eyebrow">Astra Netra</p>
     <h1>Admin Console</h1>
-    <p class="sidebar-copy">Identity operations, runtime controls, and audit review in one operator workspace.</p>
   </div>
 
-  <div class="sidebar-runtime">
-    <div class="runtime-home-label">Runtime Home</div>
-    <div class="runtime-home-value">{{ home }}</div>
-  </div>
-
-  <div class="sidebar-status-grid">
-    <div class="sidebar-status-tile">
-      <div class="label">Setup State</div>
-      <strong>{{ "Required" if setup.setup_required else "Ready" }}</strong>
+  <!-- Keycloak-style Active Realm/Tenant Context Selector -->
+  <div class="realm-selector-card">
+    <div class="realm-label">Active Realm Context</div>
+    <div class="realm-selector-value">
+      <span class="realm-selector-icon">⧉</span>
+      <span class="realm-selector-name">{{ principal.tenant_id }}</span>
     </div>
-    <div class="sidebar-status-tile">
-      <div class="label">Bootstrap Admins</div>
-      <strong>{{ setup.bootstrap_admin_count }}</strong>
-    </div>
-    <div class="sidebar-status-tile">
-      <div class="label">Setup Tokens</div>
-      <strong>{{ setup.active_setup_token_count }}</strong>
-    </div>
-  </div>
-
-  <div class="sidebar-principal">
-    <div class="label">Signed In</div>
-    <div class="principal-name">{{ principal.username }}</div>
-    <div class="principal-meta">{{ principal.tenant_id }} · {{ principal.roles|join(", ") }}</div>
+    <div class="realm-runtime-home">Home: {{ home }}</div>
   </div>
 
   <nav class="sidebar-nav">
-    {{ nav_button("Overview", "/partials/dashboard/runtime", "#workspace-tab-panel", "sidebar", "◈", "Core") }}
-    {{ nav_button("Infrastructure", "/partials/dashboard/infrastructure", "#workspace-tab-panel", "sidebar", "⛭", "Ops") }}
-    {{ nav_button("ReBAC Policies", "/partials/dashboard/rebac", "#workspace-tab-panel", "sidebar", "❖", "Policy") }}
-    {{ nav_button("Tenants", "/partials/dashboard/tenants", "#workspace-tab-panel", "sidebar", "⧉", "Tenancy") }}
-    {{ nav_button("OIDC Audit", "/partials/dashboard/oidc-audit?tenant_id=" ~ principal.tenant_id, "#workspace-tab-panel", "sidebar", "◎", "OIDC") }}
-    {{ nav_button("Admin Audit", "/partials/dashboard/admin-audit?tenant_id=" ~ principal.tenant_id, "#workspace-tab-panel", "sidebar", "▣", "IAM") }}
+    <!-- Accordion Group 1: Workspace Manage -->
+    <details class="sidebar-group" open>
+      <summary class="sidebar-group-header">
+        <span class="group-icon">📂</span>
+        <span class="group-title">Workspace Manage</span>
+        <span class="chevron">▾</span>
+      </summary>
+      <div class="sidebar-group-content">
+        {{ nav_button("Overview", "/partials/dashboard/runtime", "#workspace-tab-panel", "sidebar", "◈", "Core") }}
+        {{ nav_button("ReBAC Policies", "/partials/dashboard/rebac", "#workspace-tab-panel", "sidebar", "❖", "Policy") }}
+        {{ nav_button("Tenants", "/partials/dashboard/tenants", "#workspace-tab-panel", "sidebar", "⧉", "Tenancy") }}
+      </div>
+    </details>
+
+    <!-- Accordion Group 2: Security & Infrastructure -->
+    <details class="sidebar-group" open>
+      <summary class="sidebar-group-header">
+        <span class="group-icon">🔒</span>
+        <span class="group-title">Security & Infra</span>
+        <span class="chevron">▾</span>
+      </summary>
+      <div class="sidebar-group-content">
+        {{ nav_button("Infrastructure", "/partials/dashboard/infrastructure", "#workspace-tab-panel", "sidebar", "⛭", "Ops") }}
+        {{ nav_button("OIDC Audit", "/partials/dashboard/oidc-audit?tenant_id=" ~ principal.tenant_id, "#workspace-tab-panel", "sidebar", "◎", "OIDC") }}
+        {{ nav_button("Admin Audit", "/partials/dashboard/admin-audit?tenant_id=" ~ principal.tenant_id, "#workspace-tab-panel", "sidebar", "▣", "IAM") }}
+      </div>
+    </details>
   </nav>
 
-  <div class="sidebar-callout">
-    <h2>Operator Tips</h2>
-    <p>Confirm health first, inspect infrastructure second, and use audits after every change that touches identity or keys.</p>
+  <!-- Bottom Shell footer info & Sign Out -->
+  <div class="sidebar-footer">
+    <div class="operator-profile">
+      <div class="profile-avatar">👤</div>
+      <div class="profile-details">
+        <div class="profile-name">{{ principal.username }}</div>
+        <div class="profile-roles">{{ principal.roles|join(", ") }}</div>
+      </div>
+    </div>
+    <form class="sidebar-form"
+          hx-post="/partials/session/logout"
+          hx-target="#main-region"
+          hx-swap="innerHTML">
+      <input type="hidden" name="csrf_token" value="{{ csrf_token }}" />
+      <button class="btn btn-secondary btn-block btn-signout" type="submit">Sign Out</button>
+    </form>
   </div>
-
-  <form class="sidebar-form"
-        hx-post="/partials/session/logout"
-        hx-target="#main-region"
-        hx-swap="innerHTML">
-    <input type="hidden" name="csrf_token" value="{{ csrf_token }}" />
-    <button class="btn btn-secondary btn-block" type="submit">Sign Out</button>
-  </form>
 </div>
 {% endif %}

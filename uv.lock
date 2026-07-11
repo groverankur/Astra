@@ -291,6 +291,7 @@ source = { editable = "packages/astraauth-admin-ui" }
 dependencies = [
     { name = "astraauth" },
     { name = "fastapi", extra = ["standard-no-fastapi-cloud-cli"] },
+    { name = "htmy" },
     { name = "jinja2" },
     { name = "uvicorn" },
 ]
@@ -309,6 +310,7 @@ dev = [
 requires-dist = [
     { name = "astraauth", editable = "." },
     { name = "fastapi", extras = ["standard-no-fastapi-cloud-cli"], specifier = ">=0.121.1" },
+    { name = "htmy", specifier = ">=0.1.0" },
     { name = "jinja2", specifier = ">=3.1.6" },
     { name = "uvicorn", specifier = ">=0.38.0" },
 ]
@@ -1123,6 +1125,19 @@ source = { registry = "https://pypi.org/simple" }
 sdist = { url = "https://files.pythonhosted.org/packages/01/ee/02a2c011bdab74c6fb3c75474d40b3052059d95df7e73351460c8588d963/h11-0.16.0.tar.gz", hash = "sha256:4e35b956cf45792e4caa5885e69fba00bdbc6ffafbfa020300e549b208ee5ff1", size = 101250, upload-time = "2025-04-24T03:35:25.427Z" }
 wheels = [
     { url = "https://files.pythonhosted.org/packages/04/4b/29cac41a4d98d144bf5f6d33995617b185d14b22401f75ca86f384e87ff1/h11-0.16.0-py3-none-any.whl", hash = "sha256:63cf8bbe7522de3bf65932fda1d9c2772064ffb3dae62d55932da54b31cb6c86", size = 37515, upload-time = "2025-04-24T03:35:24.344Z" },
+]
+
+[[package]]
+name = "htmy"
+version = "0.11.0"
+source = { registry = "https://pypi.org/simple" }
+dependencies = [
+    { name = "anyio" },
+    { name = "markdown" },
+]
+sdist = { url = "https://files.pythonhosted.org/packages/d8/29/7781e0e768362872bf85581f145c11a99de31ac16163bbe78bdd3ccbb5d1/htmy-0.11.0.tar.gz", hash = "sha256:9ff4738e87e5f8bb2d6bdbc95c48315809da0ad480b1e115bc1bafa410f2b992", size = 38025, upload-time = "2026-04-21T11:20:17.52Z" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/65/25/438269ea2741c9e9b8199fcd61e1ca8dd82d9c26f1b559bfc84565ccd3ac/htmy-0.11.0-py3-none-any.whl", hash = "sha256:756c0ee714b65503ecb41f24779409455d4bf18f39b34c0d4e37b0ea3d4d3d52", size = 38204, upload-time = "2026-04-21T11:20:16.216Z" },
 ]
 
 [[package]]

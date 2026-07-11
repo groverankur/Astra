@@ -54,22 +54,24 @@ Alternatively, run the terminal-based admin dashboard:
 uv run astra admin-ui --home .astraauth --tui
 ```
 
-## 6. Run The Bootstrap Example
+## 6. Run The Unified Security Dashboard
+Astra contains a modern Obsidian-themed dashboard showcasing session audits, ReBAC live solver playground, and Multi-Factor settings:
 
 ```bash
-uv run python examples/01_bootstrap_runtime.py
+uv run python examples/astra_demo.py
 ```
+Open [http://127.0.0.1:8000](http://127.0.0.1:8000) in your browser.
 
-## 7. Explore The Feature Examples
+## 7. Explore The Web Framework Sample Apps
+We provide sample web applications demonstrating login/logout, session management, middleware wiring, and step-up MFA challenge prompts:
 
-- `examples/02_password_email_otp_step_up.py`
-- `examples/03_oidc_federation.py`
-- `examples/04_hybrid_authorization.py`
-- `examples/11_fastapi_e2e_app.py`
-  Developer reference app only. It uses demo credentials, mock OIDC behavior, and local-friendly defaults, so it should not be deployed unchanged.
-- `examples/14_encrypted_bootstrap_export.py`
+- FastAPI: `examples/fastapi_app.py`
+- Django: `examples/django_app.py`
+- Flask: `examples/flask_app.py`
+- Litestar: `examples/litestar_app.py`
+- Robyn: `examples/robyn_app.py`
 
-See [Examples](../examples/index.md) for the supported ASGI, FastAPI, Flask, Django, Litestar, and Robyn adapter examples.
+See [Examples](../examples/index.md) for more details.
 
 ## What This Quick Start Does Not Claim
 

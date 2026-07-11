@@ -1,0 +1,22 @@
+/* Custom Cobalt Indigo brand colors for Zensical documentation site */
+
+/* 1. Light Mode (Default Scheme) overrides */
+:root > * {
+  --md-primary-fg-color:             #2563eb; /* Premium Royal Cobalt Blue */
+  --md-primary-fg-color--light:      #dbeafe; /* Soft pastel blue selection tint */
+  --md-primary-fg-color--dark:       #1d4ed8; /* Deeper cobalt blue for hover states */
+  
+  --md-accent-fg-color:              #2563eb; /* Cobalt Accent */
+  --md-accent-fg-color--transparent: rgba(37, 99, 235, 0.1);
+}
+
+/* 2. Dark Mode (Slate Scheme) overrides */
+/* Uses the same Cobalt Indigo color palette for unified light & dark branding against slate bg */
+[data-md-color-scheme="slate"] {
+  --md-primary-fg-color:             #2563eb; /* Royal Cobalt Blue */
+  --md-primary-fg-color--light:      #dbeafe; /* Soft selection tint */
+  --md-primary-fg-color--dark:       #1d4ed8; /* Hover state tint */
+  
+  --md-accent-fg-color:              #2563eb; /* Cobalt Accent */
+  --md-accent-fg-color--transparent: rgba(37, 99, 235, 0.1);
+}

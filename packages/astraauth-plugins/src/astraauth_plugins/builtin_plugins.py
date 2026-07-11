@@ -75,7 +75,7 @@ class RiskSignalPlugin:
         return (ColumnExtension(self.name, "plugin_risk_extension", "risk_score"),)
 
     def _pre_authorize(self, payload: dict[str, Any]) -> dict[str, Any]:
-        risk_score = int(payload.get("risk_score", 0))
+        risk_score = int(payload.get("risk_score") or 0)
         if risk_score > self.max_risk_score:
             raise ValueError("Risk score exceeds threshold")
         return {"risk_checked": True}
@@ -84,7 +84,7 @@ class RiskSignalPlugin:
         return {"risk_mfa_hint": "challenge_if_untrusted_device"}
 
     def _score_handler(self, payload: dict[str, Any]) -> dict[str, Any]:
-        risk_score = int(payload.get("risk_score", 0))
+        risk_score = int(payload.get("risk_score") or 0)
         verdict = "allow" if risk_score <= self.max_risk_score else "deny"
         return {"plugin": self.name, "risk_score": risk_score, "verdict": verdict}
 

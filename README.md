@@ -38,6 +38,7 @@ Current baseline:
 
 ## Start Here
 
+* **Medium Article**: [Introducing Astra: The Unified Authentication and Authorization Platform for Python](https://medium.com/@astraauth/introducing-astra-the-unified-authentication-authorization-platform-for-python-d86cf5c531d0)
 1. [docs/index.md](docs/index.md)
 2. [docs/getting-started/installation.md](docs/getting-started/installation.md)
 3. [docs/getting-started/quick-start.md](docs/getting-started/quick-start.md)
@@ -109,22 +110,14 @@ uv run astra health --json
 
 ## Example Walkthroughs
 
-- [examples/01_bootstrap_runtime.py](examples/01_bootstrap_runtime.py)
-- [examples/02_password_email_otp_step_up.py](examples/02_password_email_otp_step_up.py)
-- [examples/03_oidc_federation.py](examples/03_oidc_federation.py)
-- [examples/04_hybrid_authorization.py](examples/04_hybrid_authorization.py)
-- [examples/05_asgi_app.py](examples/05_asgi_app.py)
-- [examples/06_flask_app.py](examples/06_flask_app.py)
-- [examples/07_config_reload.py](examples/07_config_reload.py)
-- [examples/08_flask_deployment.py](examples/08_flask_deployment.py)
-- [examples/09_django_deployment.py](examples/09_django_deployment.py)
-- [examples/10_admin_web_ui.py](examples/10_admin_web_ui.py)
-- [examples/11_fastapi_e2e_app.py](examples/11_fastapi_e2e_app.py)
-- [examples/12_litestar_app.py](examples/12_litestar_app.py)
-- [examples/13_robyn_app.py](examples/13_robyn_app.py)
-- [examples/14_encrypted_bootstrap_export.py](examples/14_encrypted_bootstrap_export.py)
-- [examples/15_plugin_trust_policy.py](examples/15_plugin_trust_policy.py)
-- [examples/16_webauthn_production_verifier.py](examples/16_webauthn_production_verifier.py)
+- [examples/fastapi_app.py](examples/fastapi_app.py) — Polished FastAPI end-to-end example with dark-mode UI
+- [examples/flask_app.py](examples/flask_app.py) — Polished Flask end-to-end example with dark-mode UI
+- [examples/django_app.py](examples/django_app.py) — Polished Django end-to-end example served via ASGI (Uvicorn)
+- [examples/litestar_app.py](examples/litestar_app.py) — Polished Litestar end-to-end example with dark-mode UI
+- [examples/robyn_app.py](examples/robyn_app.py) — Polished Robyn end-to-end example with Rust-backed async runtime
+- [examples/20_fastapi_dashboard.py](examples/20_fastapi_dashboard.py) — Full interactive CRUD & security dashboard app
+- [examples/21_better_auth_demo.py](examples/21_better_auth_demo.py) — Better-Auth style interactive security dashboard (MFA, session auditing)
+- [examples/archive/](examples/archive/) — Original development and adapter verification examples (01–19)
 
 ## What Is Still Left
 

@@ -28,10 +28,13 @@ Deeper deployment-specific coverage may still be needed for environments with st
 
 ## Where MFA Lives
 
-All MFA capabilities live within the consolidated root `astraauth` package under:
-- general MFA models and flows: `astraauth.core`
-- WebAuthn-specific contracts and persistence: `astraauth.webauthn`
-- runtime composition and adapter wiring: `astraauth.service` and `astraauth.adapters`
+The multi-factor authentication (MFA) capabilities are divided cleanly across the active modules and namespaces:
+
+| Scope / Component | Python Namespace | Sanskrit Brand | Responsibility |
+| :--- | :--- | :--- | :--- |
+| **Core Models & Flows** | `astraauth.core` | `Astra Yantra` | TOTP definitions, email OTP verification models, and runtime throttling rules. |
+| **WebAuthn Ceremonies** | `astraauth.webauthn` | `Astra Mudra` | FIDO2 registration schemas, credential assertion verifiers, and SQL signature check stores. |
+| **Wiring & Composition** | `astraauth.service` & `astraauth.adapters` | `Astra Sutra` & `Astra Setu` | Bootstrapping connection hooks, mapping session cookie properties, and framework adapters. |
 
 ## Abuse Controls
 

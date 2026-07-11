@@ -16,18 +16,18 @@ Astra is designed around these goals:
 - Make secrets, token keys, setup artifacts, audit records, and throttling state explicit runtime-home assets.
 - Prefer local, testable Python contracts over hidden external services.
 
-## Package Map
-
-| Astra Yantra | `astraauth (astraauth.core)` | Core platform domain, models, cryptography, and settings validation. |
-| Astra Sutra | `astraauth (astraauth.service)` | Composed runtime services execution and health diagnostics. |
-| Astra Setu | `astraauth (astraauth.adapters)` | Unified request/response adapters for ASGI, FastAPI, Flask, Django, Litestar, and Robyn. |
-| Astra Pramaan | `astraauth (astraauth.idp)` | OIDC external identity provider federation callback interfaces. |
-| Astra Mudra | `astraauth (astraauth.webauthn)` | WebAuthn production credential verifiers and registration states. |
-| Astra Niyam | `astraauth-policy` | ReBAC Zanzibar-style schema compiler and check solver engine. |
-| Astra Mandal | `astraauth-tenancy` | Multi-tenancy contextVar isolation and header routing middleware. |
-| Astra Tantra Hub | `astraauth-plugins` | Plugin registry package housing builtin geo/risk plugins. |
-| Astra Dwaar | `astraauth-cli` | Operator command CLI and interactive terminal TUI. |
-| Astra Netra | `astraauth-admin-ui` | Operator web management panel. |
+| Public Name | Technical Package / Namespace | Description |
+| --- | --- | --- |
+| `Astra Yantra` | `astraauth` (`astraauth.core`) | Core platform domain models, persistence drivers, and auth protocols |
+| `Astra Sutra` | `astraauth` (`astraauth.service`) | Runtime service execution engine, session validators, and setup helpers |
+| `Astra Setu` | `astraauth` (`astraauth.adapters`) | Web framework adapters and HTTP middleware layers |
+| `Astra Tantra` | `astraauth-plugins` (`astraauth_plugins` / `astraauth.plugins`) | Plugin hub and hook extension registry |
+| `Astra Pramaan` | `astraauth` (`astraauth.idp`) | OIDC federation providers and discovery routing |
+| `Astra Mudra` | `astraauth` (`astraauth.webauthn`) | WebAuthn verification contracts and authentication |
+| `Astra Niyam` | `astraauth-policy` (`astraauth_policy`) | Zanzibar-style ReBAC schema parsing and permission solving |
+| `Astra Mandal` | `astraauth-tenancy` (`astraauth_tenancy`) | Multi-tenancy isolation and dynamic routing |
+| `Astra Dwaar` | `astraauth-cli` (`astraauth_cli`) | Operator CLI tool and Textual TUI panel |
+| `Astra Netra` | `astraauth-admin-ui` (`astraauth_admin_ui`) | Operator Web Admin Console dashboard |
 
 The root distribution `astraauth` contains the primary library code. Ancillary utilities compile against it as workspace members.
 
@@ -36,6 +36,7 @@ The root distribution `astraauth` contains the primary library code. Ancillary u
 ```text
 Astra/
 |-- docs/                         Published documentation source
+|-- examples/                     Polished E2E framework sample applications and demos
 |-- src/
 |   `-- astraauth/                Consolidated package source
 |       |-- core/                 Core domain and persistence layers
@@ -45,13 +46,15 @@ Astra/
 |       |-- webauthn/             WebAuthn ceremony verifiers
 |       `-- plugins/              Core plugins engine and contracts
 |-- packages/
-|   |-- astraauth-cli/            Operator CLI
-|   |-- astraauth-admin-ui/       Browser admin UI
-|   `-- astraauth-plugins/        Plugins hub and built-in implementations
+|   |-- astraauth-cli/            Operator CLI (Astra Dwaar)
+|   |-- astraauth-admin-ui/       Browser admin UI (Astra Netra)
+|   |-- astraauth-plugins/        Plugins hub and built-in implementations (Astra Tantra)
+|   |-- astraauth-policy/         ReBAC access policy engine (Astra Niyam)
+|   `-- astraauth-tenancy/        Multi-tenancy isolation routing (Astra Mandal)
 |-- tests/                        Consolidated tests suite
 |-- zensical.toml                 Documentation site configuration
 |-- pyproject.toml                Workspace root configuration
-`-- uv.lock                       Workspace dependency lock
+|`-- uv.lock                       Workspace dependency lock
 ```
 
 ## High-Level Runtime Model
@@ -280,7 +283,7 @@ WebAuthn integrates with MFA as a step-up factor. A verified WebAuthn authentica
 
 ## ReBAC Policy Architecture
 
-`astraauth.policy` implements a Zanzibar-style relationship-based access control (ReBAC) system:
+`astraauth_policy` (Astra Niyam) implements a Zanzibar-style relationship-based access control (ReBAC) system:
 
 - **Schema Parser** (`parser.py`) compiles KeyNetra-style entity relationship and permission definitions from a structured DSL.
 - **Check Solver Engine** (`engine.py`) recursively processes permission and relationship checks. It includes circular loop detection via visited paths tracing and depth limit constraints.
@@ -288,7 +291,7 @@ WebAuthn integrates with MFA as a step-up factor. A verified WebAuthn authentica
 
 ## Multi-Tenancy Architecture
 
-`astraauth.tenancy` handles operator workspace boundaries and dynamic request context binding:
+`astraauth_tenancy` (Astra Mandal) handles operator workspace boundaries and dynamic request context binding:
 
 - **Tenant Workspace** (`models.py`) defines tenant schemas, database connection parameters, and maximum entity counts.
 - **Context Routing** (`middleware.py`) persists bound tenant contexts inside async/thread-safe `contextvars`.
@@ -642,6 +645,6 @@ If those items are completed and the gates above pass in a clean environment, th
 
 ## Summary
 
-Astra's architecture is modular and coherent: core domain logic is framework-neutral, service composition centralizes runtime behavior, adapters stay thin, operator tooling reuses service helpers, and admin UI workflows operate against the same runtime-home state. The current design is appropriate for a package-first authentication and authorization platform.
+Astra's architecture is modular, layered, and coherent: the core domain logic is framework-neutral, service composition centralizes runtime behavior, and web adapters remain extremely thin. Operational workflows are managed through the CLI (Astra Dwaar) and the web admin UI (Astra Netra), which interface with the same runtime-home state.
 
-The project is technically close to Version 1, but Version 1 should be treated as a release candidate milestone until the final documentation, packaging, public API, and clean-tree checks are completed.
+To guarantee release safety, the **Quality Gates** and the **Recommended Version 1 Release Checklist** are essential safeguards. They verify that linting, type-checking, E2E framework examples, and strict documentation builds pass successfully from a clean checkout prior to any distribution tag. Version 1 should be treated as a release candidate milestone until the final packaging and dry-runs are executed.
