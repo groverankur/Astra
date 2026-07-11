@@ -32,7 +32,7 @@ jobs:
           uv run ruff format --check .
 
       - name: Run Bandit Security Scanning
-        run: uv run bandit -r src/ packages/ -s B101,B105,B106,B110,B608
+        run: uv run bandit -c pyproject.toml -r src/ packages/
 
       - name: Run Semgrep Static Security Scan
         run: |

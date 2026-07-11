@@ -443,9 +443,8 @@ def create_admin_app(*, home: Path | None = None) -> FastAPI:  # noqa: C901
         form = await request.form()
         dsl = str(form.get("dsl", "")).strip()
 
-        import html as pyhtml
-
         from astraauth_policy import SchemaParser
+        from htmy import Renderer, html
 
         try:
             schema = SchemaParser.parse(dsl)
@@ -454,40 +453,54 @@ def create_admin_app(*, home: Path | None = None) -> FastAPI:  # noqa: C901
             schema_file.write_text(dsl, encoding="utf-8")
 
             # Format definitions list for user display
-            html_list = [
-                '<div style="padding: 10px; margin-top: 10px; border-radius: 4px; background: rgba(40, 167, 69, 0.15); border: 1px solid #28a745; color: #28a745;">'
-                "<strong>✓ Schema Compiled & Saved Successfully!</strong>"
-                "</div>"
-                '<div style="margin-top: 12px;">'
-                "<h4>Active Entity Nodes:</h4>"
-            ]
+            nodes = []
             for obj_name, obj in schema.objects.items():
-                escaped_name = pyhtml.escape(obj_name)
-                html_list.append(
-                    '<div style="padding: 8px; margin-bottom: 6px; border: 1px solid var(--border); border-radius: 4px; background: var(--bg-panel);">'
-                )
-                html_list.append(
-                    f"<strong>entity: {escaped_name}</strong><br/>"  # nosemgrep: python.django.security.injection.raw-html-format.raw-html-format
-                )
+                relations_block = None
+                permissions_block = None
                 if obj.relations:
-                    escaped_rels = pyhtml.escape(", ".join(obj.relations.keys()))
-                    html_list.append(
-                        f'<span style="font-size: 0.9em; color: var(--accent);">Relations:</span> <code style="font-size: 0.9em;">{escaped_rels}</code><br/>'  # nosemgrep: python.django.security.injection.raw-html-format.raw-html-format
+                    relations_block = html.div(
+                        html.span("Relations: ", style="font-size: 0.9em; color: var(--accent);"),
+                        html.code(", ".join(obj.relations.keys()), style="font-size: 0.9em;"),
+                        html.br(),
                     )
                 if obj.permissions:
-                    escaped_perms = pyhtml.escape(", ".join(obj.permissions.keys()))
-                    html_list.append(
-                        f'<span style="font-size: 0.9em; color: var(--text);">Permissions:</span> <code style="font-size: 0.9em;">{escaped_perms}</code>'  # nosemgrep: python.django.security.injection.raw-html-format.raw-html-format
+                    permissions_block = html.div(
+                        html.span("Permissions: ", style="font-size: 0.9em; color: var(--text);"),
+                        html.code(", ".join(obj.permissions.keys()), style="font-size: 0.9em;"),
                     )
-                html_list.append("</div>")
-            html_list.append("</div>")
-            return Response("".join(html_list), media_type="text/html")
+
+                nodes.append(
+                    html.div(
+                        html.strong("entity: ", obj_name),
+                        html.br(),
+                        relations_block,
+                        permissions_block,
+                        style="padding: 8px; margin-bottom: 6px; border: 1px solid var(--border); border-radius: 4px; background: var(--bg-panel);",
+                    )
+                )
+
+            panel = html.div(
+                html.div(
+                    html.strong("✓ Schema Compiled & Saved Successfully!"),
+                    style="padding: 10px; margin-top: 10px; border-radius: 4px; background: rgba(40, 167, 69, 0.15); border: 1px solid #28a745; color: #28a745;",
+                ),
+                html.div(*nodes, style="margin-top: 12px;"),
+            )
+            html_str = await Renderer().render(panel)
+            return Response(content=html_str, media_type="text/html")
         except Exception as exc:
-            escaped_exc = pyhtml.escape(str(exc))
+            panel = html.div(
+                html.strong("✗ Compilation Failed:"),
+                html.br(),
+                html.pre(
+                    str(exc),
+                    style="font-size: 0.85em; margin: 4px 0 0 0; white-space: pre-wrap;",
+                ),
+                style="padding: 10px; margin-top: 10px; border-radius: 4px; background: rgba(220, 53, 69, 0.15); border: 1px solid #dc3545; color: #dc3545;",
+            )
+            html_str = await Renderer().render(panel)
             return Response(
-                f'<div style="padding: 10px; margin-top: 10px; border-radius: 4px; background: rgba(220, 53, 69, 0.15); border: 1px solid #dc3545; color: #dc3545;">'
-                f'<strong>✗ Compilation Failed:</strong><br/><pre style="font-size: 0.85em; margin: 4px 0 0 0; white-space: pre-wrap;">{escaped_exc}</pre>'  # nosemgrep: python.django.security.injection.raw-html-format.raw-html-format
-                f"</div>",
+                content=html_str,
                 media_type="text/html",
             )
 

@@ -102,7 +102,11 @@ def test_flask_origin_policy_allows_preflight() -> None:
 
 
 def test_litestar_mount_accepts_origin_policy() -> None:
-    pytest.importorskip("litestar")
+    try:
+        import litestar
+    except (ImportError, ModuleNotFoundError):
+        pytest.skip("litestar is not importable")
+    _ = litestar
 
     from astraauth.adapters.litestar.wiring import mount_oauth
 
@@ -110,7 +114,11 @@ def test_litestar_mount_accepts_origin_policy() -> None:
 
 
 def test_robyn_mount_accepts_origin_policy() -> None:
-    pytest.importorskip("robyn")
+    try:
+        import robyn
+    except (ImportError, ModuleNotFoundError):
+        pytest.skip("robyn is not importable")
+    _ = robyn
 
     from astraauth.adapters.robyn.wiring import mount_oauth
 

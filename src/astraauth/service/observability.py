@@ -111,10 +111,10 @@ def record_event(
     # Clean up any stale file handlers from previous test runs
     for h in list(logger.handlers):
         if isinstance(h, logging.FileHandler) and Path(h.baseFilename) != path:
-            try:
+            import contextlib
+
+            with contextlib.suppress(Exception):
                 h.close()
-            except Exception:
-                pass
             logger.removeHandler(h)
 
     if not any(

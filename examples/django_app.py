@@ -88,7 +88,9 @@ from datetime import UTC, datetime
 
 from django.core.asgi import get_asgi_application
 from django.http import HttpRequest, HttpResponse, HttpResponseRedirect, JsonResponse
+from django.template import Context, Template
 from django.urls import path
+from django.utils.http import url_has_allowed_host_and_scheme
 
 from astraauth.adapters import AdapterOriginPolicy
 from astraauth.adapters.django.wiring import build_urlpatterns as build_astra_urlpatterns
@@ -277,6 +279,11 @@ def _session_info(request: HttpRequest) -> dict[str, Any] | None:
     return {"session_id": sid, "subject_id": sess.subject_id, "acr": sess.acr, "username": username}
 
 
+class HTMLResponse(HttpResponse):
+    def __init__(self, content: str = "", *args: Any, **kwargs: Any) -> None:
+        super().__init__(content, *args, content_type="text/html; charset=utf-8", **kwargs)
+
+
 def _page(title: str, body: str, session: dict | None = None) -> HttpResponse:
     nav = user_pill = ""
     if session:
@@ -284,10 +291,20 @@ def _page(title: str, body: str, session: dict | None = None) -> HttpResponse:
         user_pill = (
             f'<span class="user-pill">👤 {session["username"]} · ACR {session["acr"]}</span>'
         )
-    html = f"""<!doctype html><html><head><meta charset=utf-8><title>{title} — Astra Django</title>{CSS}</head><body>
-<div class="topbar"><h1>🛡️ Astra · Django</h1><div style="display:flex;align-items:center;gap:16px">{nav}{user_pill}</div></div>
-<div class="container">{body}</div></body></html>"""
-    return HttpResponse(html)
+    template_str = """<!doctype html><html><head><meta charset=utf-8><title>{{ title }} — Astra Django</title>{{ css|safe }}</head><body>
+<div class="topbar"><h1>🛡️ Astra · Django</h1><div style="display:flex;align-items:center;gap:16px">{{ nav|safe }}{{ user_pill|safe }}</div></div>
+<div class="container">{{ body|safe }}</div></body></html>"""
+    t = Template(template_str)
+    c = Context(
+        {
+            "title": title,
+            "css": CSS,
+            "nav": nav,
+            "user_pill": user_pill,
+            "body": body,
+        }
+    )
+    return HTMLResponse(t.render(c))
 
 
 # ---------------------------------------------------------------------------
@@ -344,11 +361,11 @@ def login_view(request: HttpRequest) -> HttpResponse:
 
     if REQUIRE_LOGIN_MFA:
         response = HttpResponseRedirect("/mfa?next=/dashboard&login_flow=true")
-        response.set_cookie("astra_temp_session", sid, httponly=True, samesite="Lax")
+        response.set_cookie("astra_temp_session", sid, httponly=True, samesite="Lax", secure=False)
         return response
 
     response = HttpResponseRedirect("/dashboard")
-    response.set_cookie("astra_session", sid, httponly=True, samesite="Lax")
+    response.set_cookie("astra_session", sid, httponly=True, samesite="Lax", secure=False)
     return response
 
 
@@ -406,11 +423,11 @@ def oidc_mock_login_view(request: HttpRequest) -> HttpResponse:
 
     if REQUIRE_LOGIN_MFA:
         response = HttpResponseRedirect("/mfa?next=/dashboard&login_flow=true")
-        response.set_cookie("astra_temp_session", sid, httponly=True, samesite="Lax")
+        response.set_cookie("astra_temp_session", sid, httponly=True, samesite="Lax", secure=False)
         return response
 
     response = HttpResponseRedirect("/dashboard")
-    response.set_cookie("astra_session", sid, httponly=True, samesite="Lax")
+    response.set_cookie("astra_session", sid, httponly=True, samesite="Lax", secure=False)
     return response
 
 
@@ -474,7 +491,7 @@ def webauthn_mock_login_view(request: HttpRequest) -> HttpResponse:
     sid = payload["sid"]
 
     response = HttpResponseRedirect("/dashboard")
-    response.set_cookie("astra_session", sid, httponly=True, samesite="Lax")
+    response.set_cookie("astra_session", sid, httponly=True, samesite="Lax", secure=False)
     return response
 
 
@@ -717,9 +734,17 @@ def mfa_verify_otp_view(request: HttpRequest) -> HttpResponse:
     if otp == "123456":
         sess.upgrade_authentication(target_acr=2, methods={"email_otp"})
         store.save(sess)
+        # Ensure next_url is safe to prevent open redirect
+        is_safe = url_has_allowed_host_and_scheme(
+            url=next_url,
+            allowed_hosts={request.get_host()},
+            require_https=request.is_secure(),
+        )
+        if not is_safe:
+            next_url = "/dashboard"
         response = HttpResponseRedirect(next_url)
         if login_flow:
-            response.set_cookie("astra_session", sid, httponly=True, samesite="Lax")
+            response.set_cookie("astra_session", sid, httponly=True, samesite="Lax", secure=False)
             response.delete_cookie("astra_temp_session")
         return response
     return _page(

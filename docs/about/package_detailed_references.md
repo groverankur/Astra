@@ -218,7 +218,7 @@ graph LR
 
 ### Module Architecture
 *   `store.py`: Exposes interfaces to persist linked identity configurations and callback states.
-*   `sql_store.py`: Concrete SQLAlchemy mapping logic for identity linking, state caching, and OIDC logs.
+*   `sql_store.py`: Concrete SQL-based store implementation for identity linking, state caching, and OIDC logs.
 *   `models.py`: Defines schemas for external credentials, role mapping rules, and identity providers.
 *   `services.py`: Dispatches JWKS verification, maps claims, links user accounts, and builds OIDC configuration discovery templates.
 

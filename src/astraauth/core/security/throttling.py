@@ -182,11 +182,16 @@ class SharedThrottleStore:
         current = now if now is not None else time.monotonic()
         db = create_sync_database(self._dsn)
         conn = db.connection()
-        safe_table = sql_identifier(self._table_name)
-        # nosemgrep: python.sqlalchemy.security.sqlalchemy-execute-raw-query.sqlalchemy-execute-raw-query, python.lang.security.audit.formatted-sql-query.formatted-sql-query
-        rows = conn.execute(
-            f"SELECT bucket, timestamps_json, blocked_until FROM {safe_table} ORDER BY bucket"  # nosec B608
-        ).fetchall()
+        # nosec B608
+        sql = compile_sql(
+            "SELECT bucket, timestamps_json, blocked_until "
+            + "FROM "
+            + self._table_name
+            + " ORDER BY bucket",
+            {},
+            self._dialect,
+        )
+        rows = conn.execute(sql.sql, sql.params).fetchall()
         db.close()
         buckets: list[ThrottleBucketSnapshot] = []
         for row in rows:

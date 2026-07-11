@@ -20,6 +20,7 @@ import logging
 from datetime import UTC, datetime
 from os import getenv
 from typing import Any
+from urllib.parse import urljoin, urlparse
 
 from astraauth.adapters import AdapterOriginPolicy, mount_oauth_flask
 from astraauth.core.adapters.http_types import NormalizedRequestContext
@@ -253,6 +254,11 @@ def create_app() -> Any:
             "username": username,
         }
 
+    def is_safe_url(target: str) -> bool:
+        ref_url = urlparse(request.host_url)
+        test_url = urlparse(urljoin(request.host_url, target))
+        return test_url.scheme in ("http", "https") and ref_url.netloc == test_url.netloc
+
     def _page(title: str, body: str, session: dict | None = None) -> str:
         nav = user_pill = ""
         if session:
@@ -316,11 +322,13 @@ def create_app() -> Any:
 
         if REQUIRE_LOGIN_MFA:
             response = make_response(redirect("/mfa?next=/dashboard&login_flow=true", 303))
-            response.set_cookie("astra_temp_session", sid, httponly=True, samesite="Lax")
+            response.set_cookie(
+                "astra_temp_session", sid, httponly=True, samesite="Lax", secure=False
+            )
             return response
 
         response = make_response(redirect("/dashboard", 303))
-        response.set_cookie("astra_session", sid, httponly=True, samesite="Lax")
+        response.set_cookie("astra_session", sid, httponly=True, samesite="Lax", secure=False)
         return response
 
     @app.route("/oidc/mock/login")
@@ -378,11 +386,13 @@ def create_app() -> Any:
 
         if REQUIRE_LOGIN_MFA:
             response = make_response(redirect("/mfa?next=/dashboard&login_flow=true", 303))
-            response.set_cookie("astra_temp_session", sid, httponly=True, samesite="Lax")
+            response.set_cookie(
+                "astra_temp_session", sid, httponly=True, samesite="Lax", secure=False
+            )
             return response
 
         response = make_response(redirect("/dashboard", 303))
-        response.set_cookie("astra_session", sid, httponly=True, samesite="Lax")
+        response.set_cookie("astra_session", sid, httponly=True, samesite="Lax", secure=False)
         return response
 
     @app.route("/webauthn/mock/login")
@@ -446,7 +456,7 @@ def create_app() -> Any:
         sid = payload["sid"]
 
         response = make_response(redirect("/dashboard", 303))
-        response.set_cookie("astra_session", sid, httponly=True, samesite="Lax")
+        response.set_cookie("astra_session", sid, httponly=True, samesite="Lax", secure=False)
         return response
 
     @app.route("/signout")
@@ -686,13 +696,21 @@ def create_app() -> Any:
         session = {"session_id": sid, "username": username, "acr": sess.acr}
 
         otp = request.form.get("otp", "")
-        next_url = request.form.get("next", "/dashboard")
+        next_val = request.form.get("next", "/dashboard")
         if otp == "123456":
             sess.upgrade_authentication(target_acr=2, methods={"email_otp"})
             store.save(sess)
-            response = make_response(redirect(next_url, 303))
+            # Map next_val to safe predefined local paths to prevent open redirect vulnerabilities
+            redirect_target = "/dashboard"
+            if next_val == "/documents":
+                redirect_target = "/documents"
+            elif next_val == "/mfa":
+                redirect_target = "/mfa"
+            response = make_response(redirect(redirect_target, 303))
             if login_flow:
-                response.set_cookie("astra_session", sid, httponly=True, samesite="Lax")
+                response.set_cookie(
+                    "astra_session", sid, httponly=True, samesite="Lax", secure=False
+                )
                 response.delete_cookie("astra_temp_session")
             return response
         return _page(
