@@ -38,7 +38,7 @@ Core platform submodules are importable via `astraauth.<submodule>` (e.g. `astra
 
 ## Start Here
 
-* **Medium Article**: [Introducing Astra: The Unified Authentication and Authorization Platform for Python](https://medium.com/@astraauth/introducing-astra-the-unified-authentication-authorization-platform-for-python-d86cf5c531d0)
+* **Medium Article**: [Introducing Astra: The Unified Authentication and Authorization Platform for Python](https://medium.com/@groverankur/from-experiment-to-platform-how-astra-became-pythons-unified-authentication-layer-cfb32655efbc?sharedUserId=groverankur)
 1. [Installation](getting-started/installation.md)
 2. [Quick Start](getting-started/quick-start.md)
 3. [Configuration](getting-started/configuration.md)

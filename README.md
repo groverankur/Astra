@@ -38,7 +38,7 @@ Current baseline:
 
 ## Start Here
 
-* **Medium Article**: [Introducing Astra: The Unified Authentication and Authorization Platform for Python](https://medium.com/@astraauth/introducing-astra-the-unified-authentication-authorization-platform-for-python-d86cf5c531d0)
+* **Medium Article**: [Introducing Astra: The Unified Authentication and Authorization Platform for Python](https://medium.com/@groverankur/from-experiment-to-platform-how-astra-became-pythons-unified-authentication-layer-cfb32655efbc?sharedUserId=groverankur)
 1. [docs/index.md](docs/index.md)
 2. [docs/getting-started/installation.md](docs/getting-started/installation.md)
 3. [docs/getting-started/quick-start.md](docs/getting-started/quick-start.md)

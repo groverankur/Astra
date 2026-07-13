@@ -99,17 +99,20 @@ This is the honest pre-release state. We're sharing the architecture and design 
 
 Astra was built with a single organizing principle: **one security domain, any framework, any scale**.
 
-It is a self-hosted Python library — not a SaaS, not a sidecar, not a separate server process — that provides a complete IAM stack in a single workspace:
+Astra is a modular monorepo consisting of:
 
-```
-astraauth (root package)
-├── astraauth.core       → Token management, session store, persistence layer
-├── astraauth.adapters   → FastAPI, Flask, Django, Litestar, Robyn, ASGI mounts
-├── astraauth.service    → Runtime factory, observability, admin helpers
-├── astraauth-policy     → Zanzibar-style ReBAC engine (pure Python, in-process)
-├── astraauth-plugins    → Plugin runtime, hook contracts, community extensions
-├── astraauth-cli        → Operator tooling, key management, diagnostics TUI
-└── astraauth-admin-ui   → Browser dashboard with audit views and htmx updates
+```text
+astraauth (Astra Yantra, Astra Sutra, Astra Setu, Astra Pramaan, Astra Mudra)
+├── astraauth.core       → Astra Yantra: Token management, session store, database persistence
+├── astraauth.adapters   → Astra Setu: Framework adapters for FastAPI, Flask, Django, Litestar, Robyn
+├── astraauth.service    → Astra Sutra: Runtime service coordinator and factory
+├── astraauth.idp        → Astra Pramaan: Federated identity mapping (OIDC)
+├── astraauth.webauthn   → Astra Mudra: FIDO2/WebAuthn passwordless verifications
+├── astraauth-policy     → Astra Niyam: Zanzibar-style ReBAC policy engine
+├── astraauth-tenancy    → Astra Mandal: Tenant isolation boundaries and context binding
+├── astraauth-plugins    → Astra Tantra: Extensible plugin runtime and hook contracts
+├── astraauth-cli        → Astra Dwaar: Operator key management and TUI dashboard
+└── astraauth-admin-ui   → Astra Netra: Interactive browser admin dashboard with htmx views
 ```
 
 ### Plugin Architecture — Extend Without Forking
@@ -186,7 +189,7 @@ policy_store.add_policy(PolicyRule(
 ))
 ```
 
-**ReBAC (Relationship-Based / Zanzibar-style):** Graph-based permission resolution, in-process, no external service required. Astra's ReBAC engine is inspired by the [Google Zanzibar paper](https://research.google/pubs/zanzibar-googles-consistent-global-authorization-system/) and the open-source work of the [KeyNetra project](https://github.com/keynetra/keynetra) — bringing Zanzibar-style relation tuples and DSL-defined schemas natively into the Python process:
+**ReBAC (Relationship-Based / Zanzibar-style, implemented by `astraauth-policy`, branded Astra Niyam):** Graph-based permission resolution, in-process, no external service required. Astra's ReBAC engine is inspired by the [Google Zanzibar paper](https://research.google/pubs/zanzibar-googles-consistent-global-authorization-system/) and the open-source work of the [KeyNetra project](https://github.com/keynetra/keynetra) — bringing Zanzibar-style relation tuples and DSL-defined schemas natively into the Python process:
 
 ```python
 from astraauth_policy.parser import SchemaParser
@@ -259,7 +262,7 @@ The frontend catches the `mfa_required` response, shows an OTP input modal, veri
 
 ### WebAuthn and Passkeys — Ceremony Complexity Absorbed by the Library
 
-Astra's WebAuthn module (`astraauth-webauthn`, branded Astra Mudra) encapsulates the entire FIDO2 ceremony: credential repository contracts, registration state management, authentication state management, and signature counter verification. The surface area you interact with is:
+Astra's WebAuthn module (`astraauth.webauthn`, branded Astra Mudra) encapsulates the entire FIDO2 ceremony: credential repository contracts, registration state management, authentication state management, and signature counter verification. The surface area you interact with is:
 
 ```python
 # Registration ceremony
@@ -305,7 +308,7 @@ One final gap worth naming explicitly: **multi-tenancy in Python auth libraries 
 
 `fastapi-users` has no tenant concept. `django-allauth` has `Site` objects, which are a legacy abstraction that doesn't map to modern SaaS tenancy. `Flask-Login` has nothing. Building multi-tenant auth yourself means threading a `tenant_id` through every session, every token claim, every authorization check — and hoping you don't forget it somewhere.
 
-In Astra, tenancy is a first-class primitive. Every session, token claim, role assignment, policy rule, and relation tuple carries a `tenant_id`. The authorization engine evaluates all checks in tenant scope. Session stores are tenant-aware. The plugin registry is per-tenant. You don't think about it because it's already there.
+In Astra, tenancy (implemented by `astraauth-tenancy`, branded Astra Mandal) is a first-class primitive. Every session, token claim, role assignment, policy rule, and relation tuple carries a `tenant_id`. The authorization engine evaluates all checks in tenant scope. Session stores are tenant-aware. The plugin registry is per-tenant. You don't think about it because it's already there.
 
 And when you're ready for production, swapping the in-memory store for a durable backend is a single configuration change — Astra's driver-first persistence layer supports **SQLite** for local development, **Postgres** for production, and **MySQL** for teams already running it in their stack.
 
